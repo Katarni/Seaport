@@ -7,7 +7,7 @@ int GetRandomFromRange(int left, int right) {
 }
 
 Manager::Manager() {
-    fine_ = total_delay_ = max_delay_ = total_waiting_time_ = 0;
+    fee_ = total_delay_ = max_delay_ = total_waiting_time_ = 0;
     count_liquid_cranes_ = count_granular_cranes = count_container_cranes_ = 1;
     delay_min_ = 0, delay_max_ = 0;
     late_arrival_min_ = 0;
@@ -48,7 +48,7 @@ double Manager::GetAverageWaitingTime() const {
 }
 
 int64_t Manager::GetFine() const {
-    return fine_;
+    return fee_;
 }
 
 int64_t Manager::GetMaxDelay() const {
@@ -86,17 +86,17 @@ void Manager::SetCountLiquidCranes(int count) {
 void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
     if (ships.empty()) return;
     std::sort(ships.begin(), ships.end());
-    int count;
+    int count_cranes;
     if (ships[0]->GetType() == TypeOfCargo::Container) {
-        count = count_container_cranes_;
+        count_cranes = count_container_cranes_;
     } else if (ships[0]->GetType() == TypeOfCargo::Granular) {
-        count = count_granular_cranes;
+        count_cranes = count_granular_cranes;
     } else {
-        count = count_liquid_cranes_;
+        count_cranes = count_liquid_cranes_;
     }
     std::sort(ships.begin(), ships.end());
     std::set<std::pair<int, int>> cranes;
-    for (int i = 0; i < count; ++i) {
+    for (int i = 0; i < count_cranes; ++i) {
         cranes.insert({0, i});
     }
     for (auto& ship : ships) {
@@ -105,13 +105,13 @@ void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
                                                 ship);
         auto [time, id] = *cranes.begin();
         cranes.erase(cranes.begin());
-        fine_ += std::max(0, time - ship->GetArrival()) * kFine;
+        fee_ += std::max(0, time - ship->GetArrival()) * kFine;
         total_waiting_time_ += std::max(0, time - ship->GetArrival());
         time = std::max(time, ship->GetArrival());
         events_[time].emplace_back(id, time,
                                    TypeOfEvent::StartOfUnloading,
                                    ship);
-        time += ship->GetTime();
+        time += ship->GetUnloadTime();
         events_[time].emplace_back(id, time,
                                    TypeOfEvent::FinishOfUnloading,
                                    ship);

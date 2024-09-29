@@ -1,7 +1,4 @@
 #pragma once
-#include <iostream>
-#include <vector>
-#include <map>
 #include "Ship.h"
 #include "Event.h"
 
@@ -50,7 +47,7 @@ public:
 private:
     std::vector<Ship> ships_;
     std::map<int, std::vector<Event>> events_;
-    int64_t fine_, total_delay_,
+    int64_t fee_, total_delay_,
             max_delay_, total_waiting_time_;
     int delay_min_, delay_max_,
         late_arrival_min_, late_arrival_max_,

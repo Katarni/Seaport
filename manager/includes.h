@@ -6,6 +6,7 @@
 #include <random>
 #include <algorithm>
 #include <set>
+#include <map>
 
 constexpr int kSpeedOfContainerCrane = 3,
         kSpeedOfLiquidCrane = 6,

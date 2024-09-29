@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include "Ship.h"
 
 enum class TypeOfEvent {

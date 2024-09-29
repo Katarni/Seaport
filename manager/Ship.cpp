@@ -1,7 +1,5 @@
 #include "Ship.h"
 
-#include <utility>
-
 std::string GenName() {
     std::random_device rd;
     std::mt19937 rng(rd());
@@ -17,7 +15,7 @@ Ship::Ship(TypeOfCargo type, const std::string& name,
     : type_(type),
       name_(name),
       weight_(weight),
-      time_(time), arrival_(arrival) {
+      unload_time_(time), arrival_(arrival) {
     if (name_.empty()) name_ = GetName();
 }
 
@@ -25,8 +23,8 @@ bool Ship::operator<(const Ship& other) const {
     if (arrival_ != other.arrival_) {
         return arrival_ < other.arrival_;
     }
-    if (time_ != other.time_) {
-        return time_ < other.time_;
+    if (unload_time_ != other.unload_time_) {
+        return unload_time_ < other.unload_time_;
     }
     return name_ < other.name_;
 }
@@ -35,8 +33,8 @@ std::string Ship::GetName() const {
     return name_;
 }
 
-int Ship::GetTime() const {
-    return time_;
+int Ship::GetUnloadTime() const {
+    return unload_time_;
 }
 
 int Ship::GetArrival() const {

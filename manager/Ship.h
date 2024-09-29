@@ -12,7 +12,7 @@ public:
 
     bool operator<(const Ship& other) const;
 
-    int GetTime() const;
+    int GetUnloadTime() const;
 
     int GetArrival() const;
 
@@ -25,5 +25,5 @@ public:
 private:
     TypeOfCargo type_;
     std::string name_;
-    int weight_, time_, arrival_;
+    int weight_, unload_time_, arrival_;
 };
