@@ -14,8 +14,10 @@ find_package(Qt6 COMPONENTS
 
 add_executable(PortManagerInterface main.cpp
         interface-includes.h
-        App.h
-        App.cpp)
+        PortModelWin.h
+        PortModelWin.cpp
+        GetDataWin.cpp
+        GetDataWin.h)
 
 target_link_libraries(PortManagerInterface
         Qt::Core
