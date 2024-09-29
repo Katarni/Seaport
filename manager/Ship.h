@@ -8,22 +8,26 @@ enum class TypeOfCargo {
 
 class Ship {
 public:
-    Ship(TypeOfCargo type, const std::string& name, int weight, int time, int arrival);
+    Ship(TypeOfCargo type, const std::string& name, int64_t weight, int64_t time, int64_t arrival);
 
     bool operator<(const Ship& other) const;
 
-    int GetUnloadTime() const;
+    int64_t GetUnloadTime() const;
 
-    int GetArrival() const;
+    int64_t GetArrival() const;
 
-    int GetWeight() const;
+    int64_t GetWeight() const;
 
     std::string GetName() const;
 
     TypeOfCargo GetType() const;
 
+    void SetArrival(int64_t arrival);
+
+    void SetUnloadTime(int64_t unload_time);
+
 private:
     TypeOfCargo type_;
     std::string name_;
-    int weight_, unload_time_, arrival_;
+    int64_t weight_, unload_time_, arrival_;
 };

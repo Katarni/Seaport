@@ -6,16 +6,9 @@ class Manager {
 public:
     Manager();
 
-    void AddShip(TypeOfCargo type, const std::string& name,
-                 int weight, int arrival);
-
-    void AddShips(const std::vector<Ship>& ships);
-
-    void ModelingForOneType(std::vector<Ship*>& ships);
+    void AddShips(std::vector<Ship>& ships);
 
     void Modeling();
-
-    std::vector<Event> GetEvents(int time);
 
     int GetCountOfShips() const;
 
@@ -45,14 +38,16 @@ public:
 
 
 private:
+    void ModelingForOneType(std::vector<Ship*>& ships);
+
     std::vector<Ship> ships_;
-    std::map<int, std::vector<Event>> events_;
+    std::vector<Event> events_;
     int64_t fee_, total_delay_,
-            max_delay_, total_waiting_time_;
-    int delay_min_, delay_max_,
-        late_arrival_min_, late_arrival_max_,
-        count_container_cranes_, count_granular_cranes,
-        count_liquid_cranes_;
-    int cur_time_, ptr_, max_time_;
+            max_delay_, total_waiting_time_,
+            delay_min_, delay_max_,
+            late_arrival_min_, late_arrival_max_,
+            count_container_cranes_, count_granular_cranes,
+            count_liquid_cranes_,
+            ptr_, max_time_;
 };
 

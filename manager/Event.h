@@ -9,20 +9,23 @@ class Event {
 public:
     Event();
 
-    Event(int time, TypeOfEvent type, Ship* ship);
+    Event(int64_t time, TypeOfEvent type, Ship* ship);
 
-    Event(int id_crane, int time, TypeOfEvent type, Ship* ship);
+    Event(int id_crane, int64_t time, TypeOfEvent type, Ship* ship);
 
-    int GetIdCrane();
+    int GetIdCrane() const;
 
-    int GetTime();
+    int64_t GetTime() const;
 
-    TypeOfEvent GetTypeOfEvent();
+    TypeOfEvent GetTypeOfEvent() const;
 
-    Ship* GetShip();
+    Ship* GetShip() const;
+
+    bool operator<(const Event& other) const;
 
 private:
-    int id_crane_, time_;
+    int id_crane_;
+    int64_t time_;
     TypeOfEvent type_;
     Ship* ship_;
 };

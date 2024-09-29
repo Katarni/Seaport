@@ -11,12 +11,14 @@ std::string GenName() {
 }
 
 Ship::Ship(TypeOfCargo type, const std::string& name,
-    int weight, int time, int arrival)
+    int64_t weight, int64_t time, int64_t arrival)
     : type_(type),
       name_(name),
       weight_(weight),
       unload_time_(time), arrival_(arrival) {
-    if (name_.empty()) name_ = GetName();
+    if (name_.empty()) {
+        name_ = GenName();
+    }
 }
 
 bool Ship::operator<(const Ship& other) const {
@@ -33,11 +35,11 @@ std::string Ship::GetName() const {
     return name_;
 }
 
-int Ship::GetUnloadTime() const {
+int64_t Ship::GetUnloadTime() const {
     return unload_time_;
 }
 
-int Ship::GetArrival() const {
+int64_t Ship::GetArrival() const {
     return arrival_;
 }
 
@@ -45,6 +47,14 @@ TypeOfCargo Ship::GetType() const {
     return type_;
 }
 
-int Ship::GetWeight() const {
+int64_t Ship::GetWeight() const {
     return weight_;
+}
+
+void Ship::SetArrival(int64_t arrival) {
+    arrival_ = arrival;
+}
+
+void Ship::SetUnloadTime(int64_t unload_time) {
+    unload_time_ = unload_time;
 }

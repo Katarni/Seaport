@@ -8,7 +8,7 @@
 #include <set>
 #include <map>
 
-constexpr int kSpeedOfContainerCrane = 3,
+constexpr int64_t kSpeedOfContainerCrane = 3,
         kSpeedOfLiquidCrane = 6,
         kSpeedOfGranularCrane = 10,
-        kFine = 2000;
+        kFee = 2000;

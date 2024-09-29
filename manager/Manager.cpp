@@ -1,9 +1,9 @@
 #include "Manager.h"
 
-int GetRandomFromRange(int left, int right) {
+int GetRandomFromRange(int64_t left, int64_t right) {
     std::random_device rd;
     std::mt19937 rng(rd());
-    return rng() % (right - left + 1) + left;
+    return (int64_t) rng() % (right - left + 1) + left;
 }
 
 Manager::Manager() {
@@ -15,35 +15,12 @@ Manager::Manager() {
     max_time_ = 0;
 }
 
-void Manager::AddShip(TypeOfCargo type, const std::string& name,
-                      int weight, int arrival) {
-    int time;
-    if (type == TypeOfCargo::Container) {
-        time = kSpeedOfContainerCrane * weight;
-    } else if (type == TypeOfCargo::Granular) {
-        time = kSpeedOfGranularCrane * weight;
-    } else {
-        time = kSpeedOfLiquidCrane * weight;
-    }
-    int delay = GetRandomFromRange(delay_min_, delay_max_);
-    int late_arrival = GetRandomFromRange(late_arrival_min_,
-                                          late_arrival_max_);
-    time += delay;
-    arrival += late_arrival;
-    total_delay_ += delay;
-    max_delay_ = std::max(max_delay_, static_cast<int64_t>(delay));
-    ships_.emplace_back(type, name, weight, time, arrival);
-}
-
-std::vector<Event> Manager::GetEvents(int time) {
-    return events_[time];
-}
-
 int Manager::GetCountOfShips() const {
     return static_cast<int>(ships_.size());
 }
 
 double Manager::GetAverageWaitingTime() const {
+    if (GetCountOfShips() == 0) return 0;
     return total_waiting_time_ / (1.0 * ships_.size());
 }
 
@@ -56,6 +33,7 @@ int64_t Manager::GetMaxDelay() const {
 }
 
 double Manager::GetAverageDelay() const {
+    if (GetCountOfShips() == 0) return 0;
     return total_delay_ / (1.0 * ships_.size());
 }
 
@@ -83,10 +61,14 @@ void Manager::SetCountLiquidCranes(int count) {
     count_liquid_cranes_ = count;
 }
 
+bool Comp(const Ship* first, const Ship* second) {
+    return *first < *second;
+}
+
 void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
     if (ships.empty()) return;
     std::sort(ships.begin(), ships.end());
-    int count_cranes;
+    int64_t count_cranes;
     if (ships[0]->GetType() == TypeOfCargo::Container) {
         count_cranes = count_container_cranes_;
     } else if (ships[0]->GetType() == TypeOfCargo::Granular) {
@@ -94,27 +76,27 @@ void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
     } else {
         count_cranes = count_liquid_cranes_;
     }
-    std::sort(ships.begin(), ships.end());
-    std::set<std::pair<int, int>> cranes;
+    std::sort(ships.begin(), ships.end(), Comp);
+    std::set<std::pair<int64_t, int>> cranes;
     for (int i = 0; i < count_cranes; ++i) {
         cranes.insert({0, i});
     }
     for (auto& ship : ships) {
-        events_[ship->GetArrival()].emplace_back(ship->GetArrival(),
-                                                TypeOfEvent::ArrivalOfShip,
-                                                ship);
+        events_.emplace_back(ship->GetArrival(),
+                             TypeOfEvent::ArrivalOfShip,
+                             ship);
         auto [time, id] = *cranes.begin();
         cranes.erase(cranes.begin());
-        fee_ += std::max(0, time - ship->GetArrival()) * kFine;
-        total_waiting_time_ += std::max(0, time - ship->GetArrival());
+        fee_ += std::max(0ll, time - ship->GetArrival()) * kFee;
+        total_waiting_time_ += std::max(0ll, time - ship->GetArrival());
         time = std::max(time, ship->GetArrival());
-        events_[time].emplace_back(id, time,
-                                   TypeOfEvent::StartOfUnloading,
-                                   ship);
+        events_.emplace_back(id, time,
+                             TypeOfEvent::StartOfUnloading,
+                             ship);
         time += ship->GetUnloadTime();
-        events_[time].emplace_back(id, time,
-                                   TypeOfEvent::FinishOfUnloading,
-                                   ship);
+        events_.emplace_back(id, time,
+                             TypeOfEvent::FinishOfUnloading,
+                             ship);
         cranes.insert({time, id});
         max_time_ = std::max(max_time_, time);
     }
@@ -134,32 +116,52 @@ void Manager::Modeling() {
     ModelingForOneType(container_ships);
     ModelingForOneType(liquid_ships);
     ModelingForOneType(granular_ships);
+    std::sort(events_.begin(), events_.end());
+    ptr_ = -1;
 }
 
-void Manager::AddShips(const std::vector<Ship>& ships) {
+void Manager::AddShips(std::vector<Ship>& ships) {
     for (auto& ship : ships) {
-        std::string name = ship.GetName();
-        AddShip(ship.GetType(), name, ship.GetWeight(),
-                ship.GetArrival());
+        int64_t time;
+        if (ship.GetType() == TypeOfCargo::Container) {
+            time = kSpeedOfContainerCrane * ship.GetWeight();
+        } else if (ship.GetType() == TypeOfCargo::Granular) {
+            time = kSpeedOfGranularCrane * ship.GetWeight();
+        } else {
+            time = kSpeedOfLiquidCrane * ship.GetWeight();
+        }
+        int64_t delay = GetRandomFromRange(delay_min_, delay_max_);
+        int64_t late_arrival = GetRandomFromRange(late_arrival_min_,
+                                                  late_arrival_max_);
+        delay = std::max(-time + 1, delay);
+        late_arrival = std::max(-ship.GetArrival() + 1, late_arrival);
+        time += delay;
+        ship.SetArrival(late_arrival + ship.GetArrival());
+        total_delay_ += delay;
+        max_delay_ = std::max(max_delay_, delay);
+        ship.SetUnloadTime(time);
     }
+    ships_ = ships;
 }
 
 Event Manager::GetNext() {
-    while (cur_time_ <= max_time_ && events_[cur_time_].size() == ptr_) cur_time_++, ptr_ = 0;
-    if (cur_time_ > max_time_) throw std::runtime_error("!!!йухан идИ");
-    return events_[cur_time_][ptr_];
+    ++ptr_;
+    if (ptr_ >= events_.size()) throw std::runtime_error("!!!йухан идИ");
+    return events_[ptr_];
 }
 
 double Manager::GetAverageQueue() {
     int balance = 0;
     int64_t total_queue = 0;
+    int cur_event = 0;
     for (int i = 1; i <= max_time_; ++i) {
-        for (auto& event : events_[i]) {
-            if (event.GetTypeOfEvent() == TypeOfEvent::ArrivalOfShip) {
+        while (cur_event < events_.size() && events_[cur_event].GetTime() == i) {
+            if (events_[cur_event].GetTypeOfEvent() == TypeOfEvent::ArrivalOfShip) {
                 ++balance;
-            } else if (event.GetTypeOfEvent() == TypeOfEvent::StartOfUnloading) {
+            } else if (events_[cur_event].GetTypeOfEvent() == TypeOfEvent::StartOfUnloading) {
                 --balance;
             }
+            ++cur_event;
         }
         total_queue += balance;
     }
@@ -167,6 +169,17 @@ double Manager::GetAverageQueue() {
 }
 
 void Manager::SetEventTime(int time) {
-    cur_time_ = time;
-    ptr_ = 0;
+    int left = -1, right = static_cast<int>(events_.size()) - 1;
+    while (right - left > 1) {
+        int mid = (left + right) / 2;
+        if (events_[mid].GetTime() < time) {
+            left = mid;
+        } else {
+            right = mid;
+        }
+    }
+    if (events_[right].GetTime() < time) {
+        throw std::runtime_error("Слишком много букв, больше трёх не перевариваю...");
+    }
+    ptr_ = right - 1;
 }
