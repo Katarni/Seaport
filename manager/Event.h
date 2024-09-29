@@ -8,6 +8,12 @@ enum class TypeOfEvent {
 
 class Event {
 public:
+    Event();
+
+    Event(int time, TypeOfEvent type, Ship* ship);
+
+    Event(int id_crane, int time, TypeOfEvent type, Ship* ship);
+
     int GetIdCrane();
 
     int GetTime();

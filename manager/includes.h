@@ -4,7 +4,10 @@
 #include <vector>
 #include <string>
 #include <random>
+#include <algorithm>
+#include <set>
 
-constexpr int kSpeedOfContainerCrane = 10,
-        kSpeedOfLiquidCrane = 7,
-        kSpeedOfGranularCrane = 4;
+constexpr int kSpeedOfContainerCrane = 3,
+        kSpeedOfLiquidCrane = 6,
+        kSpeedOfGranularCrane = 10,
+        kFine = 2000;
