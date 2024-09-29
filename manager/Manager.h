@@ -9,8 +9,10 @@ class Manager {
 public:
     Manager();
 
-    void AddShip(TypeOfCargo type, std::string name,
+    void AddShip(TypeOfCargo type, const std::string& name,
                  int weight, int arrival);
+
+    void AddShips(const std::vector<Ship>& ships);
 
     void ModelingForOneType(std::vector<Ship*>& ships);
 

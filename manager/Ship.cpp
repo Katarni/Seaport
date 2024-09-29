@@ -12,10 +12,10 @@ std::string GenName() {
     return res;
 }
 
-Ship::Ship(TypeOfCargo type, std::string name,
+Ship::Ship(TypeOfCargo type, const std::string& name,
     int weight, int time, int arrival)
     : type_(type),
-      name_(std::move(name)),
+      name_(name),
       weight_(weight),
       time_(time), arrival_(arrival) {
     if (name_.empty()) name_ = GetName();
@@ -31,18 +31,22 @@ bool Ship::operator<(const Ship& other) const {
     return name_ < other.name_;
 }
 
-std::string Ship::GetName() {
+std::string Ship::GetName() const {
     return name_;
 }
 
-int Ship::GetTime() {
+int Ship::GetTime() const {
     return time_;
 }
 
-int Ship::GetArrival() {
+int Ship::GetArrival() const {
     return arrival_;
 }
 
-TypeOfCargo Ship::GetType() {
+TypeOfCargo Ship::GetType() const {
     return type_;
+}
+
+int Ship::GetWeight() const {
+    return weight_;
 }

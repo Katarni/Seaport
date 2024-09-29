@@ -14,7 +14,7 @@ Manager::Manager() {
     late_arrival_max_ = 9;
 }
 
-void Manager::AddShip(TypeOfCargo type, std::string name,
+void Manager::AddShip(TypeOfCargo type, const std::string& name,
                       int weight, int arrival) {
     int time;
     if (type == TypeOfCargo::Container) {
@@ -131,4 +131,11 @@ void Manager::Modeling() {
     ModelingForOneType(container_ships);
     ModelingForOneType(liquid_ships);
     ModelingForOneType(granular_ships);
+}
+
+void Manager::AddShips(const std::vector<Ship>& ships) {
+    for (auto& ship : ships) {
+        std::string name = ship.GetName();
+        AddShip(ship.GetType(), name, ship.GetWeight(), ship.GetArrival());
+    }
 }
