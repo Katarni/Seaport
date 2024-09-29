@@ -12,7 +12,7 @@ Manager::Manager() {
     delay_min_ = 0, delay_max_ = 0;
     late_arrival_min_ = 0;
     late_arrival_max_ = 0;
-    max_time = 0;
+    max_time_ = 0;
 }
 
 void Manager::AddShip(TypeOfCargo type, const std::string& name,
@@ -115,7 +115,7 @@ void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
                                    TypeOfEvent::FinishOfUnloading,
                                    ship);
         cranes.insert({time, id});
-        max_time = std::max(max_time, time);
+        max_time_ = std::max(max_time_, time);
     }
 }
 
@@ -144,16 +144,28 @@ void Manager::AddShips(const std::vector<Ship>& ships) {
 }
 
 Event Manager::GetNext() {
-    while (cur_time <= max_time && events_[cur_time].size() == ptr) cur_time++, ptr = 0;
-    if (cur_time > max_time) throw std::runtime_error("!!!йухан идИ");
-    return events_[cur_time][ptr];
+    while (cur_time_ <= max_time_ && events_[cur_time_].size() == ptr_) cur_time_++, ptr_ = 0;
+    if (cur_time_ > max_time_) throw std::runtime_error("!!!йухан идИ");
+    return events_[cur_time_][ptr_];
 }
 
-double Manager::GetAverageQueue() const {
-    return static_cast<double>(0);
+double Manager::GetAverageQueue() {
+    int balance = 0;
+    int64_t total_queue = 0;
+    for (int i = 1; i <= max_time_; ++i) {
+        for (auto& event : events_[i]) {
+            if (event.GetTypeOfEvent() == TypeOfEvent::ArrivalOfShip) {
+                ++balance;
+            } else if (event.GetTypeOfEvent() == TypeOfEvent::StartOfUnloading) {
+                --balance;
+            }
+        }
+        total_queue += balance;
+    }
+    return total_queue / (1.0 * max_time_);
 }
 
 void Manager::SetEventTime(int time) {
-    cur_time = time;
-    ptr = 0;
+    cur_time_ = time;
+    ptr_ = 0;
 }

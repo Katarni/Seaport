@@ -30,7 +30,7 @@ public:
 
     double GetAverageDelay() const;
 
-    double GetAverageQueue() const;
+    double GetAverageQueue();
 
     void SetDelayRange(int left, int right);
 
@@ -56,6 +56,6 @@ private:
         late_arrival_min_, late_arrival_max_,
         count_container_cranes_, count_granular_cranes,
         count_liquid_cranes_;
-    int cur_time, ptr, max_time;
+    int cur_time_, ptr_, max_time_;
 };
 
