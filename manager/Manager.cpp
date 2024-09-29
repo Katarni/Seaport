@@ -85,6 +85,7 @@ void Manager::SetCountLiquidCranes(int count) {
 
 void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
     if (ships.empty()) return;
+    std::sort(ships.begin(), ships.end());
     int count;
     if (ships[0]->GetType() == TypeOfCargo::Container) {
         count = count_container_cranes_;
