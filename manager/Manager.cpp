@@ -9,9 +9,10 @@ int GetRandomFromRange(int left, int right) {
 Manager::Manager() {
     fine_ = total_delay_ = max_delay_ = total_waiting_time_ = 0;
     count_liquid_cranes_ = count_granular_cranes = count_container_cranes_ = 1;
-    delay_min_ = 0, delay_max_ = 12;
-    late_arrival_min_ = -2;
-    late_arrival_max_ = 9;
+    delay_min_ = 0, delay_max_ = 0;
+    late_arrival_min_ = 0;
+    late_arrival_max_ = 0;
+    max_time = 0;
 }
 
 void Manager::AddShip(TypeOfCargo type, const std::string& name,
@@ -59,13 +60,13 @@ double Manager::GetAverageDelay() const {
 }
 
 void Manager::SetDelayRange(int left, int right) {
-    if (left > right) std::swap(left, right);
+    if (left > right) throw std::runtime_error("Ты тёпленький!!!");
     delay_min_ = left;
     delay_max_ = right;
 }
 
 void Manager::SetLateArrivalRange(int left, int right) {
-    if (left > right) std::swap(left, right);
+    if (left > right) throw std::runtime_error("Ты тёпленький!!!");
     late_arrival_min_ = left;
     late_arrival_max_ = right;
 }
@@ -114,6 +115,7 @@ void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
                                    TypeOfEvent::FinishOfUnloading,
                                    ship);
         cranes.insert({time, id});
+        max_time = std::max(max_time, time);
     }
 }
 
@@ -136,6 +138,22 @@ void Manager::Modeling() {
 void Manager::AddShips(const std::vector<Ship>& ships) {
     for (auto& ship : ships) {
         std::string name = ship.GetName();
-        AddShip(ship.GetType(), name, ship.GetWeight(), ship.GetArrival());
+        AddShip(ship.GetType(), name, ship.GetWeight(),
+                ship.GetArrival());
     }
+}
+
+Event Manager::GetNext() {
+    while (cur_time <= max_time && events_[cur_time].size() == ptr) cur_time++, ptr = 0;
+    if (cur_time > max_time) throw std::runtime_error("!!!йухан идИ");
+    return events_[cur_time][ptr];
+}
+
+double Manager::GetAverageQueue() const {
+    return static_cast<double>(0);
+}
+
+void Manager::SetEventTime(int time) {
+    cur_time = time;
+    ptr = 0;
 }

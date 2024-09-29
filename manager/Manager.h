@@ -42,6 +42,10 @@ public:
 
     void SetCountLiquidCranes(int count);
 
+    Event GetNext();
+
+    void SetEventTime(int time);
+
 
 private:
     std::vector<Ship> ships_;
@@ -52,5 +56,6 @@ private:
         late_arrival_min_, late_arrival_max_,
         count_container_cranes_, count_granular_cranes,
         count_liquid_cranes_;
+    int cur_time, ptr, max_time;
 };
 
