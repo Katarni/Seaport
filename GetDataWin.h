@@ -55,6 +55,8 @@ class GetDataWin {
     }
 
     void open() {
+        bool is_shift = false;
+
         while (window_->isOpen()) {
             sf::Event event{};
             while (window_->pollEvent(event)) {
@@ -71,8 +73,45 @@ class GetDataWin {
                     }
                 }
 
-                if (event.type == sf::Event::KeyReleased) {
+                if (event.type == sf::Event::KeyPressed) {
+                    if (event.key.code == sf::Keyboard::RShift ||
+                        event.key.code == sf::Keyboard::LShift) {
+                        is_shift = true;
+                    }
+                }
 
+                if (event.type == sf::Event::KeyReleased) {
+                    if (event.key.code == sf::Keyboard::RShift ||
+                        event.key.code == sf::Keyboard::LShift) {
+                        is_shift = false;
+                    }
+
+                    if (event.key.code == sf::Keyboard::BackSpace) {
+                        for (int i = 0; i < 4; ++i) {
+                            if (random_limits_input_[i]->isSelected()) {
+                                random_limits_input_[i]->delCharacter();
+                            }
+                        }
+                    }
+
+                    if (event.key.code == sf::Keyboard::Space ||
+                        event.key.code == sf::Keyboard::Enter) {
+                        continue;
+                    }
+
+                    char event_char = kat::getCharFromEvent(event, is_shift);
+                    for (int i = 0; i < 4; ++i) {
+                        if (!random_limits_input_[i]->isSelected()) continue;
+                        if (random_limits_input_[i]->getData().size() -
+                            (!random_limits_input_[i]->getData().empty() &&
+                            random_limits_input_[i]->getData()[0] == '-') >= 2)
+                            continue;
+
+                        if ('0' <= event_char && event_char <= '9' ||
+                            event_char == '-' && random_limits_input_[i]->getData().empty()) {
+                            random_limits_input_[i]->addCharacter(event_char);
+                        }
+                    }
                 }
             }
 
