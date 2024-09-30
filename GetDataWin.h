@@ -21,9 +21,9 @@ class GetDataWin {
             random_limits_lbl_[i]->setParent(window_);
             random_limits_lbl_[i]->resize(276, 49);
             random_limits_lbl_[i]->setX(83);
-            random_limits_lbl_[i]->setY(43 + static_cast<float>(i) * (random_limits_lbl_[i]->getHeight()  + 26));
+            random_limits_lbl_[i]->setY(43 + static_cast<float>(i) * (random_limits_lbl_[i]->getHeight()  + 16));
             random_limits_lbl_[i]->setFontSize(20);
-            random_limits_lbl_[i]->setFont("../fonts/SyneMono.ttf");
+            random_limits_lbl_[i]->setFont("../fonts/KodeMono.ttf");
         }
         random_limits_lbl_[0]->setData("Unloading delay\nlimits");
         random_limits_lbl_[1]->setData("The limits of deviation\nfrom the schedule");
@@ -34,7 +34,7 @@ class GetDataWin {
             random_limits_input_[i]->setParent(window_);
             random_limits_input_[i]->resize(130, 32);
             random_limits_input_[i]->setFontSize(20);
-            random_limits_input_[i]->setFont("../fonts/SyneMono.ttf");
+            random_limits_input_[i]->setFont("../fonts/KodeMono.ttf");
             random_limits_input_[i]->setPlaceHolder(i % 2 ? "max" : "min");
             random_limits_input_[i]->setBorderRadius(15);
             random_limits_input_[i]->setBorderColor(sf::Color(31, 184, 193));
@@ -42,16 +42,60 @@ class GetDataWin {
             random_limits_input_[i]->setX(425 + static_cast<float>(i % 2) * (55 + random_limits_input_[i]->getWidth()));
             random_limits_input_[i]->setY(52 + static_cast<float>(i > 1) * (33 + random_limits_input_[i]->getHeight()));
         }
+
+        cranes_counters_lbl_.resize(3);
+        std::vector<float> cranes_counters_lbl_width = {156, 127, 145}, cranes_counters_lbl_x = {83, 328, 568};
+        for (int i = 0; i < 3; ++i) {
+            cranes_counters_lbl_[i] = new kat::Label;
+            cranes_counters_lbl_[i]->setParent(window_);
+            cranes_counters_lbl_[i]->resize(cranes_counters_lbl_width[i], 17);
+            cranes_counters_lbl_[i]->setY(170);
+            cranes_counters_lbl_[i]->setX(cranes_counters_lbl_x[i]);
+            cranes_counters_lbl_[i]->setFontSize(15);
+            cranes_counters_lbl_[i]->setFont("../fonts/KodeMono.ttf");
+        }
+        cranes_counters_lbl_[0]->setData("Container cranes:");
+        cranes_counters_lbl_[1]->setData("Liquid cranes:");
+        cranes_counters_lbl_[2]->setData("Granular cranes:");
+
+        cranes_counters_input_.resize(3);
+        for (int i = 0; i < 3; ++i) {
+            cranes_counters_input_[i] = new kat::TextInput;
+            cranes_counters_input_[i]->setParent(window_);
+            cranes_counters_input_[i]->resize(43, 19);
+            cranes_counters_input_[i]->setY(171);
+            cranes_counters_input_[i]->setX(cranes_counters_lbl_[i]->getX() + cranes_counters_lbl_[i]->getWidth() + 5);
+            cranes_counters_input_[i]->setFontSize(15);
+            cranes_counters_input_[i]->setFont("../fonts/KodeMono.ttf");
+            cranes_counters_input_[i]->setPlaceHolder("1");
+            cranes_counters_input_[i]->setBorderRadius(5);
+            cranes_counters_input_[i]->setBorderColor(sf::Color(31, 184, 193));
+            cranes_counters_input_[i]->setBorderBold(2);
+        }
+
+
+
+
+//        input_scroll_area_ = new kat::VerScrollArea();
+
+
     }
 
     ~GetDataWin() {
-        for (int i = 0; i < 2; ++i) {
-            delete random_limits_lbl_[i];
+        for (auto& elm : random_limits_lbl_) {
+            delete elm;
+        }
+        for (auto& elm : random_limits_input_) {
+            delete elm;
+        }
+        for (auto& elm : cranes_counters_lbl_) {
+            delete elm;
+        }
+        for (auto& elm : cranes_counters_input_) {
+            delete elm;
         }
 
-        for (int i = 0; i < 4; ++i) {
-            delete random_limits_input_[i];
-        }
+//        delete input_scroll_area_;
     }
 
     void open() {
@@ -66,10 +110,13 @@ class GetDataWin {
 
                 if (event.type == sf::Event::MouseButtonPressed &&
                     event.mouseButton.button == sf::Mouse::Button::Left) {
-
-                    for (int i = 0; i < 4; ++i) {
-                        random_limits_input_[i]->isPressed(static_cast<float>(event.mouseButton.x),
-                                                           static_cast<float>(event.mouseButton.y));
+                    for (auto& elm : random_limits_input_) {
+                        elm->isPressed(static_cast<float>(event.mouseButton.x),
+                                       static_cast<float>(event.mouseButton.y));
+                    }
+                    for (auto& elm : cranes_counters_input_) {
+                        elm->isPressed(static_cast<float>(event.mouseButton.x),
+                                       static_cast<float>(event.mouseButton.y));
                     }
                 }
 
@@ -87,9 +134,14 @@ class GetDataWin {
                     }
 
                     if (event.key.code == sf::Keyboard::BackSpace) {
-                        for (int i = 0; i < 4; ++i) {
-                            if (random_limits_input_[i]->isSelected()) {
-                                random_limits_input_[i]->delCharacter();
+                        for (auto& elm : random_limits_input_) {
+                            if (elm->isSelected()) {
+                                elm->delCharacter();
+                            }
+                        }
+                        for (auto& elm : cranes_counters_input_) {
+                            if (elm->isSelected()) {
+                                elm->delCharacter();
                             }
                         }
                     }
@@ -100,16 +152,25 @@ class GetDataWin {
                     }
 
                     char event_char = kat::getCharFromEvent(event, is_shift);
-                    for (int i = 0; i < 4; ++i) {
-                        if (!random_limits_input_[i]->isSelected()) continue;
-                        if (random_limits_input_[i]->getData().size() -
-                            (!random_limits_input_[i]->getData().empty() &&
-                            random_limits_input_[i]->getData()[0] == '-') >= 2)
+                    for (auto& elm : random_limits_input_) {
+                        if (!elm->isSelected()) continue;
+                        if (elm->getData().size() -
+                            (!elm->getData().empty() &&
+                                    elm->getData()[0] == '-') >= 2)
                             continue;
 
                         if ('0' <= event_char && event_char <= '9' ||
-                            event_char == '-' && random_limits_input_[i]->getData().empty()) {
-                            random_limits_input_[i]->addCharacter(event_char);
+                            event_char == '-' && elm->getData().empty()) {
+                            elm->addCharacter(event_char);
+                        }
+                    }
+
+                    for (auto& elm : cranes_counters_input_) {
+                        if (!elm->isSelected()) continue;
+                        if (elm->getData().size() >= 2) continue;
+
+                        if ('0' <= event_char && event_char <= '9') {
+                            elm->addCharacter(event_char);
                         }
                     }
                 }
@@ -117,17 +178,21 @@ class GetDataWin {
 
             window_->clear(sf::Color::White);
 
-            for (int i = 0; i < 2; ++i) {
-                random_limits_lbl_[i]->render();
+            for (auto& elm : random_limits_lbl_) {
+                elm->render();
             }
-            for (int i = 0; i < 4; ++i) {
-                random_limits_input_[i]->render();
+            for (auto& elm : random_limits_input_) {
+                elm->render();
+            }
+            for (auto& elm : cranes_counters_lbl_) {
+                elm->render();
+            }
+            for (auto& elm : cranes_counters_input_) {
+                elm->render();
             }
 
             window_->display();
         }
-
-
     }
 
  private:
@@ -137,4 +202,8 @@ class GetDataWin {
 
     std::vector<kat::TextInput*> random_limits_input_;
     std::vector<kat::Label*> random_limits_lbl_;
+    std::vector<kat::Label*> cranes_counters_lbl_;
+    std::vector<kat::TextInput*> cranes_counters_input_;
+
+//    kat::VerScrollArea* input_scroll_area_;
 };
