@@ -1,9 +1,9 @@
 #include "Ship.h"
 
-std::string GenName() {
+std::string generateName() {
     std::random_device rd;
     std::mt19937 rng(rd());
-    std::string chars = "qwertyuiopasdfghjklzxcvbnm1234567890";
+    std::string chars = "abcdefghijklmnopqrstuvwxyz1234567890";
     int sz = static_cast<int>(chars.size());
     std::string res;
     for (int i = 0; i < 6; ++i) res += chars[rng() % sz];
@@ -17,7 +17,7 @@ Ship::Ship(TypeOfCargo type, const std::string& name,
       weight_(weight),
       unload_time_(time), arrival_(arrival) {
     if (name_.empty()) {
-        name_ = GenName();
+        name_ = generateName();
     }
 }
 
@@ -31,30 +31,30 @@ bool Ship::operator<(const Ship& other) const {
     return name_ < other.name_;
 }
 
-std::string Ship::GetName() const {
+std::string Ship::getName() const {
     return name_;
 }
 
-int64_t Ship::GetUnloadTime() const {
+int64_t Ship::getUnloadTime() const {
     return unload_time_;
 }
 
-int64_t Ship::GetArrival() const {
+int64_t Ship::getArrival() const {
     return arrival_;
 }
 
-TypeOfCargo Ship::GetType() const {
+TypeOfCargo Ship::getType() const {
     return type_;
 }
 
-int64_t Ship::GetWeight() const {
+int64_t Ship::getWeight() const {
     return weight_;
 }
 
-void Ship::SetArrival(int64_t arrival) {
+void Ship::setArrival(int64_t arrival) {
     arrival_ = arrival;
 }
 
-void Ship::SetUnloadTime(int64_t unload_time) {
+void Ship::setUnloadTime(int64_t unload_time) {
     unload_time_ = unload_time;
 }

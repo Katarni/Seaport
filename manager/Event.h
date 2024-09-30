@@ -2,7 +2,7 @@
 #include "Ship.h"
 
 enum class TypeOfEvent {
-    ArrivalOfShip, StartOfUnloading, FinishOfUnloading
+    FinishOfUnloading, ArrivalOfShip, StartOfUnloading
 };
 
 class Event {
@@ -13,13 +13,13 @@ public:
 
     Event(int id_crane, int64_t time, TypeOfEvent type, Ship* ship);
 
-    int GetIdCrane() const;
+    int getIdCrane() const;
 
-    int64_t GetTime() const;
+    int64_t getTime() const;
 
-    TypeOfEvent GetTypeOfEvent() const;
+    TypeOfEvent getTypeOfEvent() const;
 
-    Ship* GetShip() const;
+    Ship* getShip() const;
 
     bool operator<(const Event& other) const;
 

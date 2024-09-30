@@ -18,19 +18,19 @@ Event::Event(int id_crane,
                            ship_(ship) {}
 
 
-int Event::GetIdCrane() const {
+int Event::getIdCrane() const {
     return id_crane_;
 }
 
-Ship* Event::GetShip() const {
+Ship* Event::getShip() const {
     return ship_;
 }
 
-int64_t Event::GetTime() const {
+int64_t Event::getTime() const {
     return time_;
 }
 
-TypeOfEvent Event::GetTypeOfEvent() const {
+TypeOfEvent Event::getTypeOfEvent() const {
     return type_;
 }
 
@@ -39,10 +39,7 @@ bool Event::operator<(const Event &other) const {
         return time_ < other.time_;
     }
     if (type_ != other.type_) {
-        if (type_ == TypeOfEvent::FinishOfUnloading) return true;
-        if (other.type_ == TypeOfEvent::FinishOfUnloading) return false;
-        if (type_ == TypeOfEvent::ArrivalOfShip) return true;
-        return false;
+        return type_ < other.type_;
     }
     return ship_ < other.ship_;
 }

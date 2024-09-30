@@ -12,19 +12,19 @@ public:
 
     bool operator<(const Ship& other) const;
 
-    int64_t GetUnloadTime() const;
+    int64_t getUnloadTime() const;
 
-    int64_t GetArrival() const;
+    int64_t getArrival() const;
 
-    int64_t GetWeight() const;
+    int64_t getWeight() const;
 
-    std::string GetName() const;
+    std::string getName() const;
 
-    TypeOfCargo GetType() const;
+    TypeOfCargo getType() const;
 
-    void SetArrival(int64_t arrival);
+    void setArrival(int64_t arrival);
 
-    void SetUnloadTime(int64_t unload_time);
+    void setUnloadTime(int64_t unload_time);
 
 private:
     TypeOfCargo type_;

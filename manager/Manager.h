@@ -6,35 +6,35 @@ class Manager {
 public:
     Manager();
 
-    void AddShips(std::vector<Ship>& ships);
+    void addShips(std::vector<Ship>& ships);
 
-    void Modeling();
+    void modeling();
 
-    int GetCountOfShips() const;
+    int getCountOfShips() const;
 
-    double GetAverageWaitingTime() const;
+    double getAverageWaitingTime() const;
 
-    int64_t GetFine() const;
+    int64_t getFine() const;
 
-    int64_t GetMaxDelay() const;
+    int64_t getMaxDelay() const;
 
-    double GetAverageDelay() const;
+    double getAverageDelay() const;
 
-    double GetAverageQueue();
+    double getAverageQueue();
 
-    void SetDelayRange(int left, int right);
+    void setDelayRange(int left, int right);
 
-    void SetLateArrivalRange(int left, int right);
+    void setLateArrivalRange(int left, int right);
 
-    void SetCountContainerCranes(int count);
+    void setCountContainerCranes(int count);
 
-    void SetCountGranularCranes(int count);
+    void setCountGranularCranes(int count);
 
-    void SetCountLiquidCranes(int count);
+    void setCountLiquidCranes(int count);
 
-    Event GetNext();
+    Event getNext();
 
-    void SetEventTime(int time);
+    void setEventTime(int time);
 
 
 private:
