@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(PortManagerInterface main.cpp
         header.h
         PortManagerWin.h
-        GetDataWin.h
+        input-data/GetDataWin.h
+        input-data/ShipInput.h
 )
 
 add_subdirectory(KatLib)
