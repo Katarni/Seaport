@@ -72,7 +72,7 @@ class GetDataWin {
             counters_input_[i]->setX(counters_lbl_[i]->getX() + counters_lbl_[i]->getWidth() + 5);
             counters_input_[i]->setFontSize(15);
             counters_input_[i]->setFont(reg_font_);
-            counters_input_[i]->setPlaceHolder("1");
+            counters_input_[i]->setPlaceHolder(std::to_string(i < 3));
             counters_input_[i]->setBorderRadius(5);
             counters_input_[i]->setBorderColor(sf::Color(31, 184, 193));
             counters_input_[i]->setBorderBold(2);
@@ -124,7 +124,9 @@ class GetDataWin {
                 if (event.type == sf::Event::MouseWheelMoved) {
                     if (ships_scroll_area_->isHovered(static_cast<float>(event.mouseButton.x),
                                                       static_cast<float>(event.mouseButton.y))) {
-                        ships_scroll_area_->moveY(static_cast<float>(kat::sign(event.mouseWheel.delta) * 5));
+                        if (ships_scroll_area_->moveAllY(static_cast<float>(kat::sign(event.mouseWheel.delta) * 5))) {
+                            last_ship_y += static_cast<float>(kat::sign(event.mouseWheel.delta) * 5);
+                        }
                     }
                 }
 
