@@ -79,6 +79,21 @@ class GetDataWin {
         }
 
         ships_scroll_area_ = new kat::VerScrollArea(83, 226, 657, 360, window_);
+
+        ships_btns_.resize(2);
+        for (int i = 0; i < 2; ++i) {
+            ships_btns_[i] = new kat::Button;
+            ships_btns_[i]->resize(17, 17);
+            ships_btns_[i]->setY(198);
+            ships_btns_[i]->setX(static_cast<float>(208 + i * 25));
+            ships_btns_[i]->setFont(reg_font_);
+            ships_btns_[i]->setFontSize(12);
+            ships_btns_[i]->setData(i ? "-" : "+");
+            ships_btns_[i]->setParent(window_);
+            ships_btns_[i]->setBorderRadius(3);
+            ships_btns_[i]->setBorderColor(sf::Color(31, 184, 193));
+            ships_btns_[i]->setBorderBold(2);
+        }
     }
 
     ~GetDataWin() {
@@ -123,6 +138,16 @@ class GetDataWin {
                         elm->isPressed(static_cast<float>(event.mouseButton.x),
                                        static_cast<float>(event.mouseButton.y));
                     }
+                    for (int i = 0; i < 2; ++i) {
+                        if (ships_btns_[i]->isPressed(static_cast<float>(event.mouseButton.x),
+                                           static_cast<float>(event.mouseButton.y))) {
+                            if (!i) {
+                                addShip(true);
+                            } else {
+                                delShip(true);
+                            }
+                        }
+                    }
                     ships_scroll_area_->isPressed(static_cast<float>(event.mouseButton.x),
                                                   static_cast<float>(event.mouseButton.y));
                 }
@@ -153,6 +178,9 @@ class GetDataWin {
             for (auto& elm : counters_input_) {
                 elm->render();
             }
+            for (auto& elm : ships_btns_) {
+                elm->render();
+            }
 
             ships_scroll_area_->render();
 
@@ -173,8 +201,44 @@ class GetDataWin {
     std::vector<kat::Label*> random_limits_lbl_;
     std::vector<kat::Label*> counters_lbl_;
     std::vector<kat::TextInput*> counters_input_;
+    std::vector<kat::Button*> ships_btns_;
+    kat::Button* submit_btn_;
 
     kat::VerScrollArea* ships_scroll_area_;
+
+    inline void addShip(bool edit_num) {
+        ships_scroll_area_->addElm(new ShipInput(last_ship_y, reg_font_, window_));
+        last_ship_y += 73;
+
+        if (edit_num) {
+            if (counters_input_[3]->getData().empty()) {
+                counters_input_[3]->setData("0");
+            }
+
+            std::string new_data = std::to_string(std::stoi(counters_input_[3]->getData()) + 1);
+            counters_input_[3]->clear();
+            for (auto c : new_data) {
+                counters_input_[3]->addCharacter(c);
+            }
+        }
+    }
+
+    inline void delShip(bool edit_num) {
+        if (edit_num) {
+            if (counters_input_[3]->getData() == "0" || counters_input_[3]->getData().empty()) return;
+        }
+
+        ships_scroll_area_->removeElm(static_cast<int>(ships_scroll_area_->getElms().size() - 1));
+        last_ship_y -= 73;
+
+        if (edit_num) {
+            std::string new_data = std::to_string(std::stoi(counters_input_[3]->getData()) - 1);
+            counters_input_[3]->clear();
+            for (auto c : new_data) {
+                counters_input_[3]->addCharacter(c);
+            }
+        }
+    }
 
     void mouseButtonRealised(const sf::Event& event) {
         if (event.key.code == sf::Keyboard::RShift ||
@@ -208,13 +272,11 @@ class GetDataWin {
             if (counters_input_[3]->isSelected()) {
                 int count = std::stoi(counters_input_[3]->getData().empty() ? "0" : counters_input_[3]->getData());
                 while (ships_scroll_area_->getElms().size() < count) {
-                    ships_scroll_area_->addElm(new ShipInput(last_ship_y, reg_font_, window_));
-                    last_ship_y += 73;
+                    addShip(false);
                 }
 
                 while (ships_scroll_area_->getElms().size() > count) {
-                    ships_scroll_area_->removeElm(static_cast<int>(ships_scroll_area_->getElms().size() - 1));
-                    last_ship_y -= 73;
+                    delShip(false);
                 }
             }
         }
