@@ -16,6 +16,7 @@ class GetDataWin {
         last_ship_y = 226;
 
         reg_font_.loadFromFile("../fonts/KodeMono.ttf");
+        blue_ = sf::Color(31, 184, 193);
 
         window_ = new sf::RenderWindow(sf::VideoMode(width_, height_), "Gat Data");
 
@@ -41,14 +42,14 @@ class GetDataWin {
             random_limits_input_[i]->setFont(reg_font_);
             random_limits_input_[i]->setPlaceHolder(i % 2 ? "max" : "min");
             random_limits_input_[i]->setBorderRadius(15);
-            random_limits_input_[i]->setBorderColor(sf::Color(31, 184, 193));
+            random_limits_input_[i]->setBorderColor(blue_);
             random_limits_input_[i]->setBorderBold(2);
             random_limits_input_[i]->setX(425 + static_cast<float>(i % 2) * (55 + random_limits_input_[i]->getWidth()));
             random_limits_input_[i]->setY(52 + static_cast<float>(i > 1) * (33 + random_limits_input_[i]->getHeight()));
         }
 
         counters_lbl_.resize(4);
-        std::vector<float> counters_lbl_width = {156, 127, 145, 57}, counters_lbl_x = {83, 328, 568, 83};
+        std::vector<float> counters_lbl_width = {156, 127, 145, 57}, counters_lbl_x = {83, 328, 545, 83};
         for (int i = 0; i < 4; ++i) {
             counters_lbl_[i] = new kat::Label;
             counters_lbl_[i]->setParent(window_);
@@ -74,7 +75,7 @@ class GetDataWin {
             counters_input_[i]->setFont(reg_font_);
             counters_input_[i]->setPlaceHolder(std::to_string(i < 3));
             counters_input_[i]->setBorderRadius(5);
-            counters_input_[i]->setBorderColor(sf::Color(31, 184, 193));
+            counters_input_[i]->setBorderColor(blue_);
             counters_input_[i]->setBorderBold(2);
         }
 
@@ -86,14 +87,26 @@ class GetDataWin {
             ships_btns_[i]->resize(17, 17);
             ships_btns_[i]->setY(198);
             ships_btns_[i]->setX(static_cast<float>(208 + i * 25));
-            ships_btns_[i]->setFont(reg_font_);
             ships_btns_[i]->setFontSize(12);
             ships_btns_[i]->setData(i ? "-" : "+");
             ships_btns_[i]->setParent(window_);
             ships_btns_[i]->setBorderRadius(3);
-            ships_btns_[i]->setBorderColor(sf::Color(31, 184, 193));
+            ships_btns_[i]->setBorderColor(blue_);
             ships_btns_[i]->setBorderBold(2);
+            ships_btns_[i]->setFont(reg_font_);
         }
+
+        submit_btn_ = new kat::Button;
+        submit_btn_->setParent(window_);
+        submit_btn_->resize(115, 25);
+        submit_btn_->setX(625);
+        submit_btn_->setY(194);
+        submit_btn_->setFont(reg_font_);
+        submit_btn_->setFontSize(18);
+        submit_btn_->setColor(sf::Color::White);
+        submit_btn_->setBackgroundColor(blue_);
+        submit_btn_->setData("simulate");
+        submit_btn_->setBorderRadius(8);
     }
 
     ~GetDataWin() {
@@ -142,13 +155,18 @@ class GetDataWin {
                     }
                     for (int i = 0; i < 2; ++i) {
                         if (ships_btns_[i]->isPressed(static_cast<float>(event.mouseButton.x),
-                                           static_cast<float>(event.mouseButton.y))) {
+                                                      static_cast<float>(event.mouseButton.y))) {
                             if (!i) {
                                 addShip(true);
                             } else {
                                 delShip(true);
                             }
                         }
+                    }
+                    if (submit_btn_->isPressed(static_cast<float>(event.mouseButton.x),
+                                               static_cast<float>(event.mouseButton.y))) {
+                        window_->close();
+                        return;
                     }
                     ships_scroll_area_->isPressed(static_cast<float>(event.mouseButton.x),
                                                   static_cast<float>(event.mouseButton.y));
@@ -184,6 +202,7 @@ class GetDataWin {
                 elm->render();
             }
 
+            submit_btn_->render();
             ships_scroll_area_->render();
 
             window_->display();
@@ -196,6 +215,7 @@ class GetDataWin {
     float last_ship_y;
 
     sf::Font reg_font_;
+    sf::Color blue_;
 
     sf::RenderWindow* window_;
 
