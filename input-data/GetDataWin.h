@@ -122,8 +122,14 @@ class GetDataWin {
         for (auto& elm : counters_input_) {
             delete elm;
         }
+        for (auto& elm : ships_btns_) {
+            delete elm;
+        }
 
+        delete submit_btn_;
         delete ships_scroll_area_;
+
+        delete window_;
     }
 
     void open() {
