@@ -13,10 +13,9 @@ class GetDataWin {
         width_ = 850;
         height_ = 600;
 
-        last_ship_y = 226;
+        last_ship_y_ = 226;
 
         reg_font_.loadFromFile("../fonts/KodeMono.ttf");
-        blue_ = sf::Color(31, 184, 193);
 
         window_ = new sf::RenderWindow(sf::VideoMode(width_, height_), "Gat Data");
 
@@ -42,7 +41,7 @@ class GetDataWin {
             random_limits_input_[i]->setFont(reg_font_);
             random_limits_input_[i]->setPlaceHolder(i % 2 ? "max" : "min");
             random_limits_input_[i]->setBorderRadius(15);
-            random_limits_input_[i]->setBorderColor(blue_);
+            random_limits_input_[i]->setBorderColor(kBlue);
             random_limits_input_[i]->setBorderBold(2);
             random_limits_input_[i]->setX(425 + static_cast<float>(i % 2) * (55 + random_limits_input_[i]->getWidth()));
             random_limits_input_[i]->setY(52 + static_cast<float>(i > 1) * (33 + random_limits_input_[i]->getHeight()));
@@ -75,7 +74,7 @@ class GetDataWin {
             counters_input_[i]->setFont(reg_font_);
             counters_input_[i]->setPlaceHolder(std::to_string(i < 3));
             counters_input_[i]->setBorderRadius(5);
-            counters_input_[i]->setBorderColor(blue_);
+            counters_input_[i]->setBorderColor(kBlue);
             counters_input_[i]->setBorderBold(2);
         }
 
@@ -91,7 +90,7 @@ class GetDataWin {
             ships_btns_[i]->setData(i ? "-" : "+");
             ships_btns_[i]->setParent(window_);
             ships_btns_[i]->setBorderRadius(3);
-            ships_btns_[i]->setBorderColor(blue_);
+            ships_btns_[i]->setBorderColor(kBlue);
             ships_btns_[i]->setBorderBold(2);
             ships_btns_[i]->setFont(reg_font_);
         }
@@ -104,7 +103,7 @@ class GetDataWin {
         submit_btn_->setFont(reg_font_);
         submit_btn_->setFontSize(18);
         submit_btn_->setColor(sf::Color::White);
-        submit_btn_->setBackgroundColor(blue_);
+        submit_btn_->setBackgroundColor(kBlue);
         submit_btn_->setData("simulate");
         submit_btn_->setBorderRadius(8);
     }
@@ -144,7 +143,7 @@ class GetDataWin {
                     if (ships_scroll_area_->isHovered(static_cast<float>(event.mouseButton.x),
                                                       static_cast<float>(event.mouseButton.y))) {
                         if (ships_scroll_area_->moveAllY(static_cast<float>(kat::sign(event.mouseWheel.delta) * 5))) {
-                            last_ship_y += static_cast<float>(kat::sign(event.mouseWheel.delta) * 5);
+                            last_ship_y_ += static_cast<float>(kat::sign(event.mouseWheel.delta) * 5);
                         }
                     }
                 }
@@ -218,10 +217,9 @@ class GetDataWin {
  private:
     bool is_shift_ = false;
     int width_, height_;
-    float last_ship_y;
+    float last_ship_y_;
 
     sf::Font reg_font_;
-    sf::Color blue_;
 
     sf::RenderWindow* window_;
 
@@ -235,8 +233,8 @@ class GetDataWin {
     kat::VerScrollArea* ships_scroll_area_;
 
     inline void addShip(bool edit_num) {
-        ships_scroll_area_->addElm(new ShipInput(last_ship_y, reg_font_, window_));
-        last_ship_y += 73;
+        ships_scroll_area_->addElm(new ShipInput(last_ship_y_, reg_font_, window_));
+        last_ship_y_ += 73;
 
         if (edit_num) {
             if (counters_input_[3]->getData().empty()) {
@@ -257,7 +255,7 @@ class GetDataWin {
         }
 
         ships_scroll_area_->removeElm(static_cast<int>(ships_scroll_area_->getElms().size() - 1));
-        last_ship_y -= 73;
+        last_ship_y_ -= 73;
 
         if (edit_num) {
             std::string new_data = std::to_string(std::stoi(counters_input_[3]->getData()) - 1);

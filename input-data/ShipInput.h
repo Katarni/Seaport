@@ -11,7 +11,7 @@ class ShipInput : public kat::TextInput {
  public:
     ShipInput(float y, const sf::Font& font, sf::RenderWindow* parent) :
             TextInput(99, y, 626, 58, font, parent) {
-        lbls_.resize(4);
+        labels_.resize(4);
         inputs_.resize(4);
 
         setBorderBold(2);
@@ -23,14 +23,14 @@ class ShipInput : public kat::TextInput {
         std::vector<std::string> lbls_text = {"name", "type", "weight", "arrival"},
                                 placeholders_text = {"random", "1", "1", "dd:hh:mm"};
         for (int i = 0; i < 4; ++i) {
-            lbls_[i] = new kat::Label;
-            lbls_[i]->setParent(getParent());
-            lbls_[i]->resize(lbls_width[i], 26);
-            lbls_[i]->setY(16);
-            lbls_[i]->setX(lbls_x[i]);
-            lbls_[i]->setData(lbls_text[i]);
-            lbls_[i]->setFontSize(20);
-            lbls_[i]->setFont(font);
+            labels_[i] = new kat::Label;
+            labels_[i]->setParent(getParent());
+            labels_[i]->resize(lbls_width[i], 26);
+            labels_[i]->setY(16);
+            labels_[i]->setX(lbls_x[i]);
+            labels_[i]->setData(lbls_text[i]);
+            labels_[i]->setFontSize(20);
+            labels_[i]->setFont(font);
 
             inputs_[i] = new kat::TextInput;
             inputs_[i]->setParent(getParent());
@@ -38,7 +38,7 @@ class ShipInput : public kat::TextInput {
             inputs_[i]->setBorderColor(sf::Color(31, 184, 193));
             inputs_[i]->setBorderBold(2);
             inputs_[i]->setPlaceHolder(placeholders_text[i]);
-            inputs_[i]->setX(lbls_[i]->getX() + lbls_[i]->getWidth() + 3);
+            inputs_[i]->setX(labels_[i]->getX() + labels_[i]->getWidth() + 3);
             inputs_[i]->setY(16);
             inputs_[i]->setFontSize(18);
             inputs_[i]->setFont(font);
@@ -50,7 +50,7 @@ class ShipInput : public kat::TextInput {
         if (!needRender()) return;
         kat::Div::render();
 
-        for (auto elm : lbls_) {
+        for (auto elm : labels_) {
             elm->moveX(getX());
             elm->moveY(getY());
             elm->render();
@@ -167,6 +167,6 @@ class ShipInput : public kat::TextInput {
     }
 
  private:
-    std::vector<kat::Label*> lbls_;
+    std::vector<kat::Label*> labels_;
     std::vector<kat::TextInput*> inputs_;
 };
