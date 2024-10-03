@@ -1,0 +1,3 @@
+[submodule "KatLib"]
+	path = KatLib
+	url = https://github.com/Katarni/KatLib.git
