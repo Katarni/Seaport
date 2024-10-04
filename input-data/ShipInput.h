@@ -166,6 +166,49 @@ class ShipInput : public kat::TextInput {
         }
     }
 
+    std::string getName() {
+        return labels_[0]->getData();
+    }
+
+    int64_t getTime() {
+        std::string time_s;
+        if (labels_[3]->getData().size() < 8) {
+            time_s = "00:00:00";
+        }
+        time_s = labels_[3]->getData();
+        time_s.push_back(':');
+
+        int64_t time = 0, mul = 60 * 24, cur = 0;
+        int i = 0;
+        for (char c : time_s) {
+            if (c == ':') {
+                time += cur * mul;
+                mul /= (i == 0) ? 24 : 60;
+                ++i;
+                cur = 0;
+                continue;
+            }
+
+            cur = cur * 10 + c - '0';
+        }
+
+        return time;
+    }
+
+    int64_t getType() {
+        if (labels_[1]->getData().empty()) {
+            return 1;
+        }
+        return std::stoll(labels_[1]->getData());
+    }
+
+    int64_t getWeight() {
+        if (labels_[2]->getData().empty()) {
+            return 1;
+        }
+        return std::stoll(labels_[2]->getData());
+    }
+
  private:
     std::vector<kat::Label*> labels_;
     std::vector<kat::TextInput*> inputs_;

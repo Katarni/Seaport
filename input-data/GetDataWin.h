@@ -43,8 +43,10 @@ class GetDataWin {
             random_limits_input_[i]->setBorderRadius(15);
             random_limits_input_[i]->setBorderColor(kBlue);
             random_limits_input_[i]->setBorderBold(2);
-            random_limits_input_[i]->setX(425 + static_cast<float>(i % 2) * (55 + random_limits_input_[i]->getWidth()));
-            random_limits_input_[i]->setY(52 + static_cast<float>(i > 1) * (33 + random_limits_input_[i]->getHeight()));
+            random_limits_input_[i]->setX(425 + static_cast<float>(i % 2) *
+                                                    (55 + random_limits_input_[i]->getWidth()));
+            random_limits_input_[i]->setY(52 + static_cast<float>(i > 1) *
+                                                    (33 + random_limits_input_[i]->getHeight()));
         }
 
         counters_lbl_.resize(4);
@@ -212,6 +214,41 @@ class GetDataWin {
 
             window_->display();
         }
+    }
+
+    std::vector<int> getCranesCounts() {
+        std::string data1 = counters_input_[0]->getData().empty() ? "1" : counters_input_[0]->getData();
+        std::string data2 = counters_input_[1]->getData().empty() ? "1" : counters_input_[1]->getData();
+        std::string data3 = counters_input_[2]->getData().empty() ? "1" : counters_input_[2]->getData();
+        return {std::stoi(data1), std::stoi(data2), std::stoi(data3)};
+    }
+
+    int64_t getShipsCount() {
+        return std::stoll(counters_input_[3]->getData().empty() ? "0" : counters_input_[3]->getData());
+    }
+
+    std::vector<std::tuple<std::string, int64_t, int64_t, int64_t>> getShipsData() {
+        std::vector<std::tuple<std::string, int64_t, int64_t, int64_t>> data;
+        for (auto& elm : ships_scroll_area_->getElms()) {
+            auto ship = dynamic_cast<ShipInput*>(elm);
+            data.emplace_back(ship->getName(), ship->getType(), ship->getWeight(), ship->getTime());
+        }
+
+        return data;
+    }
+
+    std::pair<int, int> getDelayLimits() {
+        std::string data1 = random_limits_input_[0]->getData().empty() ? "0" : random_limits_input_[0]->getData();
+        std::string data2 = random_limits_input_[1]->getData().empty() ? "0" : random_limits_input_[1]->getData();
+        return {std::min(std::stoi(data1), std::stoi(data2)),
+                std::max(std::stoi(data1), std::stoi(data2))};
+    }
+
+    std::pair<int, int> getDeviationLimits() {
+        std::string data1 = random_limits_input_[2]->getData().empty() ? "0" : random_limits_input_[2]->getData();
+        std::string data2 = random_limits_input_[3]->getData().empty() ? "0" : random_limits_input_[3]->getData();
+        return {std::min(std::stoi(data1), std::stoi(data2)),
+                std::max(std::stoi(data1), std::stoi(data2))};
     }
 
  private:

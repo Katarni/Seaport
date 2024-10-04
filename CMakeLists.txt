@@ -8,6 +8,13 @@ add_executable(PortManagerInterface main.cpp
         PortManagerWin.h
         input-data/GetDataWin.h
         input-data/ShipInput.h
+        manager/Ship.cpp
+        manager/Ship.h
+        manager/Manager.cpp
+        manager/Manager.h
+        manager/Event.cpp
+        manager/Event.h
+        manager/includes.h
 )
 
 add_subdirectory(KatLib)

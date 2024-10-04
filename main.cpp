@@ -6,6 +6,13 @@
 #include "PortManagerWin.h"
 
 int main() {
-    auto getDataWin = new GetDataWin;
-    getDataWin->open();
+    auto get_data_win = new GetDataWin;
+    get_data_win->open();
+
+    auto port_manager_win = new PortManagerWin;
+    port_manager_win->loadData(get_data_win);
+
+    delete get_data_win;
+
+    port_manager_win->modeling();
 }
