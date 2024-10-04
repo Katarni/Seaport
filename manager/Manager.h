@@ -6,7 +6,7 @@ class Manager {
 public:
     Manager();
 
-    void addShips(std::vector<Ship>& ships);
+    void setShips(std::vector<Ship>& ships);
 
     void modeling();
 

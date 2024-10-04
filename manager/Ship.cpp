@@ -11,11 +11,11 @@ std::string generateName() {
 }
 
 Ship::Ship(TypeOfCargo type, const std::string& name,
-    int64_t weight, int64_t time, int64_t arrival)
+    int64_t weight, int64_t arrival)
     : type_(type),
       name_(name),
       weight_(weight),
-      unload_time_(time), arrival_(arrival) {
+      unload_time_(0), arrival_(arrival) {
     if (name_.empty()) {
         name_ = generateName();
     }

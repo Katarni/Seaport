@@ -8,7 +8,7 @@ enum class TypeOfCargo {
 
 class Ship {
 public:
-    Ship(TypeOfCargo type, const std::string& name, int64_t weight, int64_t time, int64_t arrival);
+    Ship(TypeOfCargo type, const std::string& name, int64_t weight, int64_t arrival);
 
     bool operator<(const Ship& other) const;
 

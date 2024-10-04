@@ -11,4 +11,4 @@
 constexpr int64_t kSpeedOfContainerCrane = 3,
         kSpeedOfLiquidCrane = 6,
         kSpeedOfGranularCrane = 10,
-        kFee = 2000;
+        kFee = 2000, kArrivalOnScreen = 3;
