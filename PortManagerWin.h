@@ -33,7 +33,7 @@ class PortManagerWin {
         std::vector<Ship> ships_;
         auto ships_data = data_win->getShipsData();
         for (auto data : ships_data) {
-            ships_.emplace_back(TypeOfCargo(get<1>(data)), get<0>(data), get<2>(data), -1, get<3>(data));
+            ships_.emplace_back(TypeOfCargo(get<1>(data)), get<0>(data), get<2>(data), get<3>(data));
         }
     }
 
