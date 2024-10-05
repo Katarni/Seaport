@@ -75,18 +75,32 @@ void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
     std::sort(ships.begin(), ships.end(), [](auto lhs, auto rhs) {
         return *lhs < *rhs;
     });
-    std::set<std::pair<int64_t, int>> cranes;
+    auto comparator = [](std::pair<int64_t, int> lhs, std::pair<int64_t, int> rhs) {
+        if (lhs.first + lhs.second != rhs.first + rhs.second) {
+            return lhs.first + lhs.second < rhs.first + rhs.second;
+        }
+        return lhs.second < rhs.second;
+    };
+    std::set<std::pair<int64_t, int>, decltype(comparator)> cranes;
     for (int i = 0; i < count_cranes; ++i) {
         cranes.insert({0, i});
     }
     for (auto& ship : ships) {
+        events_.emplace_back(ship->getArrival() - kArrivalOnScreen,
+                             TypeOfEvent::ArrivalOnScreen,
+                             ship);
         events_.emplace_back(ship->getArrival(),
-                             TypeOfEvent::ArrivalOfShip,
+                             TypeOfEvent::ArrivalAtPort,
                              ship);
         auto [time, id] = *cranes.begin();
         cranes.erase(cranes.begin());
+        time = std::max(ship->getArrival(), time - id - 1);
         fee_ += std::max(0ll, time - ship->getArrival()) * kFee;
         total_waiting_time_ += std::max(0ll, time - ship->getArrival());
+        events_.emplace_back(id, time,
+                             TypeOfEvent::StartMovingToCrane,
+                             ship);
+        time += id + 1;
         time = std::max(time, ship->getArrival());
         events_.emplace_back(id, time,
                              TypeOfEvent::StartOfUnloading,
@@ -118,7 +132,7 @@ void Manager::modeling() {
     ptr_ = -1;
 }
 
-void Manager::addShips(std::vector<Ship>& ships) {
+void Manager::setShips(std::vector<Ship>& ships) {
     for (auto& ship : ships) {
         int64_t time;
         if (ship.getType() == TypeOfCargo::Container) {
@@ -154,9 +168,9 @@ double Manager::getAverageQueue() {
     int cur_event = 0;
     for (int i = 1; i <= max_time_; ++i) {
         while (cur_event < events_.size() && events_[cur_event].getTime() == i) {
-            if (events_[cur_event].getTypeOfEvent() == TypeOfEvent::ArrivalOfShip) {
+            if (events_[cur_event].getTypeOfEvent() == TypeOfEvent::ArrivalAtPort) {
                 ++balance;
-            } else if (events_[cur_event].getTypeOfEvent() == TypeOfEvent::StartOfUnloading) {
+            } else if (events_[cur_event].getTypeOfEvent() == TypeOfEvent::StartMovingToCrane) {
                 --balance;
             }
             ++cur_event;

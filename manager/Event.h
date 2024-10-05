@@ -2,7 +2,7 @@
 #include "Ship.h"
 
 enum class TypeOfEvent {
-    FinishOfUnloading, ArrivalOfShip, StartOfUnloading
+    FinishOfUnloading, ArrivalOnScreen, ArrivalAtPort, StartMovingToCrane, StartOfUnloading
 };
 
 class Event {
