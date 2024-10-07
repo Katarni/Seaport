@@ -86,7 +86,7 @@ void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
         cranes.insert({0, i});
     }
     for (auto& ship : ships) {
-        events_.emplace_back(ship->getArrival() - kArrivalOnScreen,
+        events_.emplace_back(ship->getArrival() - kDistArrivalQueue / kSpeedShip,
                              TypeOfEvent::ArrivalOnScreen,
                              ship);
         events_.emplace_back(ship->getArrival(),
@@ -94,13 +94,14 @@ void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
                              ship);
         auto [time, id] = *cranes.begin();
         cranes.erase(cranes.begin());
-        time = std::max(ship->getArrival(), time - id - 1);
+        int64_t time_to_crane = kDistQueueFirst / kSpeedShip + id * kDistCranes / kSpeedShip;
+        time = std::max(ship->getArrival(), time - time_to_crane);
         fee_ += std::max(0ll, time - ship->getArrival()) * kFee;
         total_waiting_time_ += std::max(0ll, time - ship->getArrival());
         events_.emplace_back(id, time,
                              TypeOfEvent::StartMovingToCrane,
                              ship);
-        time += id + 1;
+        time += time_to_crane;
         time = std::max(time, ship->getArrival());
         events_.emplace_back(id, time,
                              TypeOfEvent::StartOfUnloading,
