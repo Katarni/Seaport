@@ -15,6 +15,8 @@ add_executable(PortManagerInterface main.cpp
         manager/Event.cpp
         manager/Event.h
         manager/includes.h
+        ships/DrawableShip.h
+        ships/MovingEvent.h
 )
 
 add_subdirectory(KatLib)
