@@ -8,4 +8,4 @@
 #include <iostream>
 #include <vector>
 
-const sf::Color kBlue = sf::Color(31, 184, 193);
+const sf::Color kBlue = sf::Color(31, 184, 193), kLightBlue = sf::Color(16, 204, 224);
