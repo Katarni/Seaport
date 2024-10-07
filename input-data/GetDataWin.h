@@ -362,6 +362,7 @@ class GetDataWin {
         for (auto& elm : counters_input_) {
             if (!elm->isSelected()) continue;
             if (elm->getData().size() >= 2) continue;
+            if (event_char == '0' && elm->getData().empty()) continue;
 
             if ('0' <= event_char && event_char <= '9') {
                 elm->addCharacter(event_char);
