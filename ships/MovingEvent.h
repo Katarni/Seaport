@@ -14,7 +14,8 @@ class MovingEvent {
                 bool is_y_first, int64_t start_time) : from_x_(from_x), from_y_(from_y),
                                                        delta_x_(delta_x), delta_y_(delta_y),
                                                     is_y_first_(is_y_first), start_time_(start_time) {
-        end_time_ = static_cast<int64_t>(static_cast<float>(start_time_) + (delta_x + delta_y) / kSpeedShip);
+        end_time_ = static_cast<int64_t>(static_cast<float>(start_time_) + (std::abs(delta_x) +
+                                                                            std::abs(delta_y)) / kSpeedShip);
     }
 
     [[nodiscard]]
@@ -24,18 +25,24 @@ class MovingEvent {
 
         if (!is_y_first_) {
             if (static_cast<float>(time - start_time_) * kSpeedShip <= delta_x_) {
-                return {from_x_ + static_cast<float>(time - start_time_) * kSpeedShip, from_y_};
+                return {from_x_ + static_cast<float>(time - start_time_)
+                                * kSpeedShip * (delta_x_ > 0 ? 1.0 : -1.0), from_y_};
             }
 
             return {from_x_ + delta_x_,
-                    from_y_ + (static_cast<float>(time - start_time_) - (delta_x_ / kSpeedShip)) * kSpeedShip};
+                    from_y_ + (static_cast<float>(time - start_time_) -
+                                (std::abs(delta_x_) / kSpeedShip))
+                                * kSpeedShip * (delta_y_ > 0 ? 1.0 : -1.0)};
         }
 
         if (static_cast<float>(time - start_time_) * kSpeedShip <= delta_y_) {
-            return {from_x_, from_y_ + static_cast<float>(time - start_time_) * kSpeedShip};
+            return {from_x_, from_y_ + static_cast<float>(time - start_time_) *
+                                        kSpeedShip * (delta_y_ > 0 ? 1.0 : -1.0)};
         }
 
-        return {from_x_ + (static_cast<float>(time - start_time_) - (delta_y_ / kSpeedShip)) * kSpeedShip,
+        return {from_x_ + (static_cast<float>(time - start_time_) -
+                            (std::abs(delta_y_) / kSpeedShip)) *
+                            kSpeedShip * (delta_x_ > 0 ? 1.0 : -1.0),
                 from_y_ + delta_y_};
     }
 

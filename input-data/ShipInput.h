@@ -21,7 +21,7 @@ class ShipInput : public kat::TextInput {
         std::vector<float> lbls_width = {48, 48, 72, 84}, lbls_x = {18, 182, 275, 412},
                             inputs_width = {105, 34, 54, 105};
         std::vector<std::string> lbls_text = {"name", "type", "weight", "arrival"},
-                                placeholders_text = {"random", "1", "1", "dd:hh:mm"};
+                                placeholders_text = {"random", "0", "1", "dd:hh:mm"};
         for (int i = 0; i < 4; ++i) {
             labels_[i] = new kat::Label;
             labels_[i]->setParent(getParent());
@@ -167,15 +167,15 @@ class ShipInput : public kat::TextInput {
     }
 
     std::string getName() {
-        return labels_[0]->getData();
+        return inputs_[0]->getData();
     }
 
     int64_t getTime() {
         std::string time_s;
-        if (labels_[3]->getData().size() < 8) {
+        if (inputs_[3]->getData().size() < 8) {
             time_s = "00:00:00";
         }
-        time_s = labels_[3]->getData();
+        time_s = inputs_[3]->getData();
         time_s.push_back(':');
 
         int64_t time = 0, mul = 60 * 24, cur = 0;
@@ -196,17 +196,17 @@ class ShipInput : public kat::TextInput {
     }
 
     int64_t getType() {
-        if (labels_[1]->getData().empty()) {
-            return 1;
+        if (inputs_[1]->getData().empty()) {
+            return 0;
         }
-        return std::stoll(labels_[1]->getData());
+        return std::stoll(inputs_[1]->getData());
     }
 
     int64_t getWeight() {
-        if (labels_[2]->getData().empty()) {
+        if (inputs_[2]->getData().empty()) {
             return 1;
         }
-        return std::stoll(labels_[2]->getData());
+        return std::stoll(inputs_[2]->getData());
     }
 
  private:

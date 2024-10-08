@@ -130,7 +130,7 @@ void Manager::modeling() {
     ModelingForOneType(liquid_ships);
     ModelingForOneType(granular_ships);
     std::sort(events_.begin(), events_.end());
-    ptr_ = -1;
+    ptr_ = 0;
 }
 
 void Manager::setShips(std::vector<Ship>& ships) {
@@ -157,10 +157,14 @@ void Manager::setShips(std::vector<Ship>& ships) {
     ships_ = ships;
 }
 
-Event Manager::getNext() {
-    ++ptr_;
-    if (ptr_ >= events_.size()) throw std::runtime_error("!!!!йухан идИ");
+Event Manager::getCur() {
     return events_[ptr_];
+}
+
+bool Manager::goNext() {
+    if (ptr_ + 1 >= events_.size()) return 1;
+    ++ptr_;
+    return 0;
 }
 
 double Manager::getAverageQueue() {

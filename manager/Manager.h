@@ -32,7 +32,9 @@ public:
 
     void setCountLiquidCranes(int count);
 
-    Event getNext();
+    Event getCur();
+
+    bool goNext();
 
     void setEventTime(int time);
 

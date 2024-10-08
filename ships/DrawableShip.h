@@ -8,31 +8,30 @@
 
 class DrawableShip : public kat::Image {
  public:
-    DrawableShip(float y, int type, sf::RenderWindow* parent) {
+    DrawableShip(int type, sf::RenderWindow* parent) {
         std::vector<std::string> clrs = {"red", "blue", "viol"};
         std::vector<std::string> types = {"container", "granular", "liquid"};
         std::random_device rd;
         std::mt19937 rng(rd());
-        loadFromFile("../sprites/" + types[type] + "-ship/" + clrs[rng() % 3]);
+        loadFromFile("../sprites/" + types[type] + "-ship/" + clrs[rng() % 3] + ".png");
 
         setParent(parent);
-        setY(y);
-        setX(-getWidth());
     }
 
-    void updCoorInTime(int64_t time) {
-        if (events[0].getCoorInTime(time).first == -1e5) return;
-        if (events.back().getCoorInTime(time).first == 1e5) return;
+    int updCoorInTime(int64_t time) {
+        if (events[0].getCoorInTime(time).first == -1e5) return 1;
+        if (events.back().getCoorInTime(time).first == 1e5) return 0;
 
-        for (int i = 1; i < events.size(); ++i) {
-            if (abs(events[i].getCoorInTime(time).first) != 1e5) {
+        for (int i = 0; i < events.size(); ++i) {
+            if (std::abs(events[i].getCoorInTime(time).first) != 1e5) {
                 setX(events[i].getCoorInTime(time).first);
-                setX(events[i].getCoorInTime(time).second);
-                return;
-            } else if (events[i].getCoorInTime(time).first == -events[i - 1].getCoorInTime(time).first) {
+                setY(events[i].getCoorInTime(time).second);
+                return 0;
+            } else if (i > 0 && events[i].getCoorInTime(time).first == -events[i - 1].getCoorInTime(time).first &&
+                        std::abs(events[i].getCoorInTime(time).first) == 1e5) {
                 setX(events[i - 1].getEndPos().first);
-                setX(events[i - 1].getEndPos().second);
-                return;
+                setY(events[i - 1].getEndPos().second);
+                return 0;
             }
         }
     }
