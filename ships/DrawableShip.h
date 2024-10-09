@@ -20,6 +20,8 @@ class DrawableShip : public kat::Image {
         loadFromFile(path + ".png");
 
         setParent(parent);
+
+        delta_x_ = 0;
     }
 
     int updCoorInTime(int64_t time) {
@@ -28,22 +30,30 @@ class DrawableShip : public kat::Image {
 
         for (int i = 0; i < events.size(); ++i) {
             if (std::abs(events[i].getCoorInTime(time).first) != 1e5) {
-                setX(events[i].getCoorInTime(time).first);
+                setX(events[i].getCoorInTime(time).first + delta_x_);
                 setY(events[i].getCoorInTime(time).second);
                 return 0;
             } else if (i > 0 && events[i].getCoorInTime(time).first == -events[i - 1].getCoorInTime(time).first &&
                         std::abs(events[i].getCoorInTime(time).first) == 1e5) {
-                setX(events[i - 1].getEndPos().first);
+                setX(events[i - 1].getEndPos().first + delta_x_);
                 setY(events[i - 1].getEndPos().second);
                 return 0;
             }
         }
+
+        return 1;
     }
 
     void addEvent(const MovingEvent& event) {
         events.push_back(event);
     }
 
+    void moveX(float delta) override {
+        delta_x_ += delta;
+        kat::Image::moveX(delta);
+    }
+
  private:
     std::vector<MovingEvent> events;
+    float delta_x_;
 };

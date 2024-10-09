@@ -127,6 +127,19 @@ class PortManagerWin {
         buoy = new kat::Image("../sprites/buoy.png", window_);
         buoy->setY(static_cast<float>(height_ - 10));
         cranes_scroll_->addElm(buoy);
+
+        clock_truck_ = new kat::Image("../sprites/clock-truck.png", window_);
+        clock_truck_->setX(240);
+        clock_truck_->setY(24);
+        clock_truck_->scale(2.5);
+
+        clock_lbl_= new kat::Label(249, 29,
+                                   clock_truck_->getScaledWidth(),
+                                   clock_truck_->getScaledHeight(),
+                                   "", "../fonts/KodeMono.ttf", window_);
+        clock_lbl_->setBackgroundColor(sf::Color::Transparent);
+        clock_lbl_->setColor(sf::Color::White);
+        clock_lbl_->setFontSize(14);
     }
 
     void modeling() {
@@ -135,6 +148,8 @@ class PortManagerWin {
         int64_t last_time = getCurrTime();
 
         pollManagerEvent();
+
+        bool pause_ = false;
 
         while (window_->isOpen()) {
             sf::Event event{};
@@ -145,17 +160,27 @@ class PortManagerWin {
 
                 if (event.type == sf::Event::MouseWheelScrolled) {
                     if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-                        cranes_scroll_->moveAllX(event.mouseWheelScroll.delta);
+                        if (cranes_scroll_->moveAllX(event.mouseWheelScroll.delta)) {
+                            for (auto & [key, val] : ships_) {
+                                val->moveX(event.mouseWheelScroll.delta);
+                            }
+                        }
+                    }
+                }
+
+                if (event.type == sf::Event::KeyReleased) {
+                    if (event.key.code == sf::Keyboard::Space) {
+                        pause_ = !pause_;
                     }
                 }
             }
 
-            if (last_time + 1000 / 12 > getCurrTime()) continue;
-
-            last_time = getCurrTime();
-            ++time_;
-
-            pollManagerEvent();
+            if (last_time + 1000 / 12 < getCurrTime() && !pause_) {
+                last_time = getCurrTime();
+                ++time_;
+                pollManagerEvent();
+                clock_lbl_->setData(intToTime(time_));
+            }
 
             window_->clear(kLightBlue);
 
@@ -165,6 +190,9 @@ class PortManagerWin {
             }
 
             cranes_scroll_->render();
+
+            clock_truck_->render();
+            clock_lbl_->render();
 
             window_->display();
         }
@@ -177,6 +205,9 @@ class PortManagerWin {
     Manager *manager_;
 
     std::map<Ship*, DrawableShip*> ships_;
+
+    kat::Label *clock_lbl_;
+    kat::Image *clock_truck_;
 
     kat::HorScrollArea *cranes_scroll_;
 
@@ -244,7 +275,7 @@ class PortManagerWin {
                 from_y = 117;
                 dis_y *= -1;
             } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
-
+                from_y = 0;
             } else {
                 from_y = 244;
             }

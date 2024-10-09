@@ -18,3 +18,36 @@ int64_t getCurrTime() {
             <std::chrono::milliseconds>
             (std::chrono::steady_clock::now().time_since_epoch()).count();
 }
+
+std::string intToTime(int64_t time) {
+    if (time < 0) return "00:00:00";
+
+    std::string res;
+    if (std::to_string(time / (24 * 60)).size() == 1) {
+        res = "0" + std::to_string(time / (24 * 60));
+    } else {
+        res = std::to_string(time / (24 * 60));
+    }
+
+    res += ":";
+
+    time %= (24 * 60);
+
+    if (std::to_string(time / 60).size() == 1) {
+        res += "0" + std::to_string(time / 60);
+    } else {
+        res += std::to_string(time / 60);
+    }
+
+    time %= 60;
+
+    res += ":";
+
+    if (std::to_string(time).size() == 1) {
+        res += "0" + std::to_string(time);
+    } else {
+        res += std::to_string(time);
+    }
+
+    return res;
+}
