@@ -155,7 +155,7 @@ class PortManagerWin {
             } else if (i == 1) {
                 ships_at_queue_lbls_[i]->setY(188);
             } else {
-                ships_at_queue_lbls_[i]->setY(0);
+                ships_at_queue_lbls_[i]->setY(static_cast<float>(height_) - 196);
             }
 
             ships_at_queue_lbls_[i]->setFontSize(18);
@@ -312,7 +312,7 @@ class PortManagerWin {
                 from_y = 117;
                 dis_y *= -1;
             } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
-                from_y = 0;
+                from_y = static_cast<float>(height_) - 140;
             } else {
                 from_y = 244;
             }

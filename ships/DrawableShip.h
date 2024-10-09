@@ -16,6 +16,8 @@ class DrawableShip : public kat::Image {
         std::string path = "../sprites/" + types[type] + "-ship/" + clrs[rng() % 3];
         if (type == 1) {
             path += rng() % 2 ? "-green" : "-blue";
+        } else if (type == 2) {
+            path += rng() % 2 ? "-yellow" : "-grey";
         }
         loadFromFile(path + ".png");
 
