@@ -140,6 +140,29 @@ class PortManagerWin {
         clock_lbl_->setBackgroundColor(sf::Color::Transparent);
         clock_lbl_->setColor(sf::Color::White);
         clock_lbl_->setFontSize(14);
+
+        ships_at_queue_counters_.resize(3);
+        ships_at_queue_lbls_.resize(3);
+        for (int i = 0; i < 3; ++i) {
+            ships_at_queue_lbls_[i] = new kat::Label;
+            ships_at_queue_lbls_[i]->setParent(window_);
+            ships_at_queue_lbls_[i]->setX(77);
+            ships_at_queue_lbls_[i]->setWidth(77);
+            ships_at_queue_lbls_[i]->setHeight(22);
+
+            if (i == 0) {
+                ships_at_queue_lbls_[i]->setY(105);
+            } else if (i == 1) {
+                ships_at_queue_lbls_[i]->setY(188);
+            } else {
+                ships_at_queue_lbls_[i]->setY(0);
+            }
+
+            ships_at_queue_lbls_[i]->setFontSize(18);
+            ships_at_queue_lbls_[i]->setFont("../fonts/KodeMono.ttf");
+            ships_at_queue_lbls_[i]->setBackgroundColor(sf::Color::Transparent);
+            ships_at_queue_lbls_[i]->setColor(sf::Color::White);
+        }
     }
 
     void modeling() {
@@ -175,11 +198,16 @@ class PortManagerWin {
                 }
             }
 
-            if (last_time + 1000 / 12 < getCurrTime() && !pause_) {
+            if (last_time + 1000 / 24 < getCurrTime() && !pause_) {
                 last_time = getCurrTime();
                 ++time_;
                 pollManagerEvent();
                 clock_lbl_->setData(intToTime(time_));
+
+                for (int i = 0; i < 3; ++i) {
+                    if (ships_at_queue_counters_[i] == 0) continue;
+                    ships_at_queue_lbls_[i]->setData(std::to_string(ships_at_queue_counters_[i]));
+                }
             }
 
             window_->clear(kLightBlue);
@@ -194,6 +222,10 @@ class PortManagerWin {
             clock_truck_->render();
             clock_lbl_->render();
 
+            for (int i = 0; i < 3; ++i) {
+                ships_at_queue_lbls_[i]->render();
+            }
+
             window_->display();
         }
     }
@@ -203,6 +235,9 @@ class PortManagerWin {
     int width_, height_;
     sf::RenderWindow *window_;
     Manager *manager_;
+
+    std::vector<int> ships_at_queue_counters_;
+    std::vector<kat::Label*> ships_at_queue_lbls_;
 
     std::map<Ship*, DrawableShip*> ships_;
 
@@ -251,6 +286,8 @@ class PortManagerWin {
 
             ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
         } else if (event.getTypeOfEvent() == TypeOfEvent::StartMovingToCrane) {
+            ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] -= 1;
+
             is_y_first = false;
             from_x = 77;
             dis_x = static_cast<float>(40 + 144 * (event.getIdCrane() + 1));
@@ -286,6 +323,8 @@ class PortManagerWin {
                              static_cast<float>(width_));
 
             ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
+        } else if (event.getTypeOfEvent() == TypeOfEvent::ArrivalAtPort) {
+            ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] += 1;
         }
     }
 };
