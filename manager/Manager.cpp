@@ -161,9 +161,15 @@ Event Manager::getCur() {
     return events_[ptr_];
 }
 
-bool Manager::goNext() {
+int Manager::goNext() {
     if (ptr_ + 1 >= events_.size()) return 1;
     ++ptr_;
+    return 0;
+}
+
+int Manager::goPrev() {
+    if (ptr_ == 0) return 1;
+    --ptr_;
     return 0;
 }
 

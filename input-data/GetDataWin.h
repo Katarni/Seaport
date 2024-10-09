@@ -81,6 +81,7 @@ class GetDataWin {
         }
 
         ships_scroll_area_ = new kat::VerScrollArea(83, 226, 657, 360, window_);
+        ships_scroll_area_->setCropBorders(true);
 
         ships_btns_.resize(2);
         for (int i = 0; i < 2; ++i) {

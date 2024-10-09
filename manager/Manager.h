@@ -34,7 +34,8 @@ public:
 
     Event getCur();
 
-    bool goNext();
+    int goNext();
+    int goPrev();
 
     void setEventTime(int time);
 

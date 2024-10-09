@@ -128,7 +128,7 @@ class PortManagerWin {
         buoy->setY(static_cast<float>(height_ - 10));
         cranes_scroll_->addElm(buoy);
 
-        clock_truck_ = new kat::Image("../sprites/clock-truck.png", window_);
+        clock_truck_ = new kat::Image("../sprites/trucks/normal.png", window_);
         clock_truck_->setX(240);
         clock_truck_->setY(24);
         clock_truck_->scale(2.5);
@@ -140,6 +140,11 @@ class PortManagerWin {
         clock_lbl_->setBackgroundColor(sf::Color::Transparent);
         clock_lbl_->setColor(sf::Color::White);
         clock_lbl_->setFontSize(14);
+
+        btns_truck_ = new kat::Image("../sprites/trucks/reversed.png", window_);
+        btns_truck_->setX(280);
+        btns_truck_->setY(331);
+        btns_truck_->scale(2.5);
 
         ships_at_queue_counters_.resize(3);
         ships_at_queue_lbls_.resize(3);
@@ -163,6 +168,42 @@ class PortManagerWin {
             ships_at_queue_lbls_[i]->setBackgroundColor(sf::Color::Transparent);
             ships_at_queue_lbls_[i]->setColor(sf::Color::White);
         }
+
+        control_btns_imgs_.resize(3);
+        control_btns_.resize(3);
+
+        control_btns_[0] = new kat::Button;
+        control_btns_imgs_[0] = new kat::Image;
+        control_btns_[1] = new kat::Button;
+        control_btns_imgs_[1] = new kat::Image;
+        control_btns_[2] = new kat::Button;
+        control_btns_imgs_[2] = new kat::Image;
+
+        control_btns_[0]->setX(btns_truck_->getX() + 25);
+        control_btns_[1]->setX(btns_truck_->getX() + 51);
+        control_btns_[2]->setX(btns_truck_->getX() + 76);
+        control_btns_imgs_[0]->setX(btns_truck_->getX() + 25);
+        control_btns_imgs_[1]->setX(btns_truck_->getX() + 51);
+        control_btns_imgs_[2]->setX(btns_truck_->getX() + 76);
+
+        control_btns_imgs_[0]->loadFromFile("../sprites/btns/left-arrow.png");
+        control_btns_imgs_[1]->loadFromFile("../sprites/btns/pause.png");
+        control_btns_imgs_[2]->loadFromFile("../sprites/btns/right-arrow.png");
+
+        for (int i = 0; i < 3; ++i) {
+            control_btns_imgs_[i]->setParent(window_);
+            control_btns_imgs_[i]->scale(2);
+            control_btns_imgs_[i]->setY(btns_truck_->getY() +
+                                        (btns_truck_->getScaledHeight()
+                                         - control_btns_imgs_[i]->getScaledHeight()) / 2);
+
+            control_btns_[i]->setParent(window_);
+            control_btns_[i]->setY(btns_truck_->getY() +
+                                    (btns_truck_->getScaledHeight()
+                                        - control_btns_imgs_[i]->getScaledHeight()) / 2);
+            control_btns_[i]->setHeight(control_btns_imgs_[i]->getScaledHeight());
+            control_btns_[i]->setWidth(control_btns_imgs_[i]->getScaledWidth());
+        }
     }
 
     void modeling() {
@@ -170,7 +211,7 @@ class PortManagerWin {
 
         int64_t last_time = getCurrTime();
 
-        pollManagerEvent();
+        forwardEvents();
 
         bool pause_ = false;
 
@@ -193,7 +234,63 @@ class PortManagerWin {
 
                 if (event.type == sf::Event::KeyReleased) {
                     if (event.key.code == sf::Keyboard::Space) {
+                        if (pause_) {
+                            control_btns_imgs_[1]->loadFromFile("../sprites/btns/pause.png");
+                        } else {
+                            control_btns_imgs_[1]->loadFromFile("../sprites/btns/play.png");
+                        }
                         pause_ = !pause_;
+                    }
+                }
+
+                if (event.type == sf::Event::MouseButtonReleased) {
+                    if (pause_) {
+                        for (auto & [key, val] : ships_) {
+                            val->isSelected(static_cast<float>(event.mouseButton.x),
+                                            static_cast<float>(event.mouseButton.y));
+                        }
+                    }
+
+                    if (control_btns_[0]->isPressed(static_cast<float>(event.mouseButton.x),
+                                                    static_cast<float>(event.mouseButton.y))) {
+                        if (time_ % (24 * 60) == 0) {
+                            time_ -= 24*60;
+                        } else {
+                            time_ -= time_ % (24 * 60);
+                        }
+                        backwardEvent();
+                    }
+
+                    if (control_btns_[1]->isPressed(static_cast<float>(event.mouseButton.x),
+                                                    static_cast<float>(event.mouseButton.y))) {
+                        if (pause_) {
+                            control_btns_imgs_[1]->loadFromFile("../sprites/btns/pause.png");
+                        } else {
+                            control_btns_imgs_[1]->loadFromFile("../sprites/btns/play.png");
+                        }
+                        pause_ = !pause_;
+                    }
+
+                    if (control_btns_[2]->isPressed(static_cast<float>(event.mouseButton.x),
+                                                    static_cast<float>(event.mouseButton.y))) {
+
+                        time_ += 24 * 60 - time_ % (24 * 60);
+                        forwardEvents();
+                    }
+                }
+            }
+
+            if (last_time + 1000 / 24 < getCurrTime()) {
+                clock_lbl_->setData(intToTime(time_));
+
+                for (int i = 0; i < 3; ++i) {
+                    if (ships_at_queue_counters_[i] == 0) {
+                        ships_at_queue_lbls_[i]->setData("");
+                    } else {
+                        if (ships_at_queue_counters_[i] < 0) {
+                            std::cout << 0;
+                        }
+                        ships_at_queue_lbls_[i]->setData(std::to_string(ships_at_queue_counters_[i]));
                     }
                 }
             }
@@ -201,13 +298,7 @@ class PortManagerWin {
             if (last_time + 1000 / 24 < getCurrTime() && !pause_) {
                 last_time = getCurrTime();
                 ++time_;
-                pollManagerEvent();
-                clock_lbl_->setData(intToTime(time_));
-
-                for (int i = 0; i < 3; ++i) {
-                    if (ships_at_queue_counters_[i] == 0) continue;
-                    ships_at_queue_lbls_[i]->setData(std::to_string(ships_at_queue_counters_[i]));
-                }
+                forwardEvents();
             }
 
             window_->clear(kLightBlue);
@@ -222,8 +313,11 @@ class PortManagerWin {
             clock_truck_->render();
             clock_lbl_->render();
 
+            btns_truck_->render();
+
             for (int i = 0; i < 3; ++i) {
                 ships_at_queue_lbls_[i]->render();
+                control_btns_imgs_[i]->render();
             }
 
             window_->display();
@@ -242,13 +336,16 @@ class PortManagerWin {
     std::map<Ship*, DrawableShip*> ships_;
 
     kat::Label *clock_lbl_;
-    kat::Image *clock_truck_;
+    kat::Image *clock_truck_, *btns_truck_;
+
+    std::vector<kat::Image*> control_btns_imgs_;
+    std::vector<kat::Button*> control_btns_;
 
     kat::HorScrollArea *cranes_scroll_;
 
     std::vector<std::pair<float, float>> max_crane_x_;
 
-    void pollManagerEvent() {
+    void forwardEvents() {
         if (time_ == static_cast<int64_t>(-1e18)) {
             time_ = manager_->getCur().getTime();
 
@@ -256,15 +353,25 @@ class PortManagerWin {
             manager_->goNext();
         }
 
-        while (time_ == manager_->getCur().getTime()) {
+        while (time_ >= manager_->getCur().getTime()) {
             convertEventToShip(manager_->getCur());
             if (manager_->goNext()) break;
         }
     }
 
+    void backwardEvent() {
+        if (time_ < manager_->getCur().getTime() && manager_->goPrev()) return;
+
+        while (time_ < manager_->getCur().getTime()) {
+            rollbackEvent(manager_->getCur());
+            if (manager_->goPrev()) break;
+        }
+    }
+
     void convertEventToShip(const Event& event) {
         if (ships_[event.getShip()] == nullptr) {
-            ships_[event.getShip()] = new DrawableShip(static_cast<int>(event.getShip()->getType()), window_);
+            ships_[event.getShip()] = new DrawableShip(static_cast<int>(event.getShip()->getType()),
+                                                       window_, event.getShip());
         }
 
         float from_y, from_x, dis_x, dis_y;
@@ -324,6 +431,18 @@ class PortManagerWin {
 
             ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
         } else if (event.getTypeOfEvent() == TypeOfEvent::ArrivalAtPort) {
+            ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] += 1;
+        }
+    }
+
+    void rollbackEvent(const Event& event) {
+        if (event.getTypeOfEvent() == TypeOfEvent::ArrivalAtPort) {
+            ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] -= 1;
+        } else if (event.getTypeOfEvent() == TypeOfEvent::FinishOfUnloading ||
+                event.getTypeOfEvent() == TypeOfEvent::ArrivalOnScreen) {
+            ships_[event.getShip()]->popBack();
+        } else if (event.getTypeOfEvent() == TypeOfEvent::StartMovingToCrane) {
+            ships_[event.getShip()]->popBack();
             ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] += 1;
         }
     }
