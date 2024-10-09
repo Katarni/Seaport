@@ -10,10 +10,14 @@ class DrawableShip : public kat::Image {
  public:
     DrawableShip(int type, sf::RenderWindow* parent) {
         std::vector<std::string> clrs = {"red", "blue", "viol"};
-        std::vector<std::string> types = {"container", "granular", "liquid"};
+        std::vector<std::string> types = {"container", "liquid", "granular"};
         std::random_device rd;
         std::mt19937 rng(rd());
-        loadFromFile("../sprites/" + types[type] + "-ship/" + clrs[rng() % 3] + ".png");
+        std::string path = "../sprites/" + types[type] + "-ship/" + clrs[rng() % 3];
+        if (type == 1) {
+            path += rng() % 2 ? "-green" : "-blue";
+        }
+        loadFromFile(path + ".png");
 
         setParent(parent);
     }

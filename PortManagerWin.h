@@ -204,14 +204,6 @@ class PortManagerWin {
         float from_y, from_x, dis_x, dis_y;
         bool is_y_first;
 
-        if (event.getShip()->getType() == TypeOfCargo::Container) {
-            from_y = 139;
-        } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
-            from_y = static_cast<float>(height_) - 162;
-        } else {
-
-        }
-
         if (event.getTypeOfEvent() == TypeOfEvent::ArrivalOnScreen) {
             dis_y = 0;
             dis_x = 144;
@@ -223,7 +215,7 @@ class PortManagerWin {
             } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
                 from_y = static_cast<float>(height_) - 162;
             } else {
-
+                from_y = 222;
             }
 
             ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
@@ -231,28 +223,30 @@ class PortManagerWin {
             is_y_first = false;
             from_x = 77;
             dis_x = static_cast<float>(40 + 144 * (event.getIdCrane() + 1));
-            dis_y = -22;
+            dis_y = 22;
 
             if (event.getShip()->getType() == TypeOfCargo::Container) {
                 from_y = 139;
+                dis_y *= -1;
             } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
                 from_y = static_cast<float>(height_) - 162;
             } else {
-
+                from_y = 222;
             }
 
             ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
         } else if (event.getTypeOfEvent() == TypeOfEvent::FinishOfUnloading) {
-            from_x = static_cast<float>(117 + 144 * (event.getIdCrane() + 1));
+            from_x = static_cast<float>(127 + 144 * (event.getIdCrane() + 1));
             is_y_first = true;
-            dis_y = 22;
+            dis_y = -22;
 
             if (event.getShip()->getType() == TypeOfCargo::Container) {
                 from_y = 117;
+                dis_y *= -1;
             } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
 
             } else {
-
+                from_y = 244;
             }
 
             dis_x = std::max(std::max({max_crane_x_[0].second,
