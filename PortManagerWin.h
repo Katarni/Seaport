@@ -16,8 +16,6 @@ class PortManagerWin {
         window_ = new sf::RenderWindow(sf::VideoMode(width_, height_), "Modeling");
         time_ = -1e18;
 
-        max_crane_x_.resize(3);
-
         manager_ = new Manager;
         manager_->setDelayRange(data_win->getDelayLimits().first,
                                 data_win->getDelayLimits().second);
@@ -61,11 +59,8 @@ class PortManagerWin {
             cranes_scroll_->addElm(temp_crane);
         }
 
-        max_crane_x_[0] = {176 + border->getWidth(), last_crane_x};
-
-        border = new kat::Image("../sprites/borders/top-end.png", window_);
-        border->setX(last_crane_x);
-        cranes_scroll_->addElm(border);
+        std::vector<float> max_crane_x(3);
+        max_crane_x[0] = last_crane_x;
 
         last_crane_x = 176;
         border = new kat::Image("../sprites/borders/central-start.png", window_);
@@ -81,12 +76,7 @@ class PortManagerWin {
             last_crane_x += temp_crane->getWidth();
             cranes_scroll_->addElm(temp_crane);
         }
-        max_crane_x_[1] = {176 + border->getWidth(), last_crane_x};
-
-        border = new kat::Image("../sprites/borders/central-end.png", window_);
-        border->setX(last_crane_x);
-        border->setY(256);
-        cranes_scroll_->addElm(border);
+        max_crane_x[1] = last_crane_x;
 
         last_crane_x = 176;
         border = new kat::Image("../sprites/borders/bottom-start.png", window_);
@@ -102,25 +92,65 @@ class PortManagerWin {
             cranes_scroll_->addElm(temp_crane);
         }
 
-        max_crane_x_[2] = {176 + border->getWidth(), last_crane_x};
+        max_crane_x[2] = last_crane_x;
+
+        max_crane_x_ = std::max({max_crane_x[0], max_crane_x[1], max_crane_x[2]});
+
+        while (max_crane_x[0] < max_crane_x_) {
+            std::random_device rd;
+            std::mt19937 rng(rd());
+            auto temp_crane = new kat::Image("../sprites/spaces/top/sprite-0"
+                    + std::to_string(rng() % 2 + 1) + ".png",
+                                             window_);
+            temp_crane->setX(max_crane_x[0]);
+            max_crane_x[0] += temp_crane->getWidth();
+            cranes_scroll_->addElm(temp_crane);
+        }
+
+        while (max_crane_x[1] < max_crane_x_) {
+            std::random_device rd;
+            std::mt19937 rng(rd());
+            auto temp_crane = new kat::Image("../sprites/spaces/central/sprite-0" +
+                                                std::to_string(rng() % 2 + 1) + ".png",
+                                             window_);
+            temp_crane->setX(max_crane_x[1]);
+            temp_crane->setY(256);
+            max_crane_x[1] += temp_crane->getWidth();
+            cranes_scroll_->addElm(temp_crane);
+        }
+
+        while (max_crane_x[2] < max_crane_x_) {
+            std::random_device rd;
+            std::mt19937 rng(rd());
+            auto temp_crane = new kat::Image("../sprites/spaces/bottom/sprite-0" +
+                                                std::to_string(rng() % 2 + 1) + ".png",
+                                             window_);
+            temp_crane->setX(max_crane_x[2]);
+            temp_crane->setY(572);
+            max_crane_x[2] += temp_crane->getWidth();
+            cranes_scroll_->addElm(temp_crane);
+        }
+
+        border = new kat::Image("../sprites/borders/top-end.png", window_);
+        border->setX(max_crane_x[0]);
+        cranes_scroll_->addElm(border);
+
+        border = new kat::Image("../sprites/borders/central-end.png", window_);
+        border->setX(max_crane_x[1]);
+        border->setY(256);
+        cranes_scroll_->addElm(border);
 
         border = new kat::Image("../sprites/borders/bottom-end.png", window_);
-        border->setX(last_crane_x);
+        border->setX(max_crane_x[2]);
         border->setY(572);
         cranes_scroll_->addElm(border);
 
         buoy = new kat::Image("../sprites/buoy.png", window_);
-        buoy->setX(std::max(std::max({max_crane_x_[0].second,
-                             max_crane_x_[1].second,
-                             max_crane_x_[2].second}) + border->getWidth() + 200,
-                            static_cast<float>(width_ - 10)));
+        buoy->setX(std::max(max_crane_x_ + border->getWidth() + 200, static_cast<float>(width_ - 10)));
         cranes_scroll_->addElm(buoy);
 
         buoy = new kat::Image("../sprites/buoy.png", window_);
-        buoy->setX(std::max(std::max({max_crane_x_[0].second,
-                                      max_crane_x_[1].second,
-                                      max_crane_x_[2].second}) + border->getWidth() + 200,
-                            static_cast<float>(width_ - 10)));
+        buoy->setX(std::max(max_crane_x_ + border->getWidth() + 200,static_cast<float>(width_ - 10)));
         buoy->setY(static_cast<float>(height_ - 10));
         cranes_scroll_->addElm(buoy);
 
@@ -343,7 +373,7 @@ class PortManagerWin {
 
     kat::HorScrollArea *cranes_scroll_;
 
-    std::vector<std::pair<float, float>> max_crane_x_;
+    float max_crane_x_;
 
     void forwardEvents() {
         if (time_ == static_cast<int64_t>(-1e18)) {
@@ -411,7 +441,7 @@ class PortManagerWin {
 
             ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
         } else if (event.getTypeOfEvent() == TypeOfEvent::FinishOfUnloading) {
-            from_x = static_cast<float>(127 + 144 * (event.getIdCrane() + 1));
+            from_x = static_cast<float>(143 + 128 * (event.getIdCrane() + 1));
             is_y_first = true;
             dis_y = -22;
 
@@ -424,10 +454,7 @@ class PortManagerWin {
                 from_y = 244;
             }
 
-            dis_x = std::max(std::max({max_crane_x_[0].second,
-                                       max_crane_x_[1].second,
-                                       max_crane_x_[2].second}) + 280,
-                             static_cast<float>(width_));
+            dis_x = std::max(max_crane_x_ + 280, static_cast<float>(width_));
 
             ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
         } else if (event.getTypeOfEvent() == TypeOfEvent::ArrivalAtPort) {
