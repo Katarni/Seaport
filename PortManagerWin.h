@@ -397,7 +397,7 @@ class PortManagerWin {
 
             is_y_first = false;
             from_x = 77;
-            dis_x = static_cast<float>(40 + 144 * (event.getIdCrane() + 1));
+            dis_x = static_cast<float>(56 + 128 * (event.getIdCrane() + 1));
             dis_y = 22;
 
             if (event.getShip()->getType() == TypeOfCargo::Container) {
