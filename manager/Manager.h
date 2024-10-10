@@ -6,7 +6,7 @@ class Manager {
 public:
     Manager();
 
-    void setShips(std::vector<Ship>& ships);
+    void setShips(std::vector<ScheduleItem>& ships);
 
     void modeling();
 
@@ -39,12 +39,15 @@ public:
 
     void setEventTime(int time);
 
+    std::vector<ScheduleItem>& getSchedule();
+
 
 private:
     void ModelingForOneType(std::vector<Ship*>& ships);
 
     std::vector<Ship> ships_;
     std::vector<Event> events_;
+    std::vector<ScheduleItem> schedule_;
     int64_t fee_, total_delay_,
             max_delay_, total_waiting_time_,
             delay_min_, delay_max_,

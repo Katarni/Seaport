@@ -1,33 +1,23 @@
 #pragma once
 #include "includes.h"
+#include "ScheduleItem.h"
 
-
-enum class TypeOfCargo {
-    Container, Liquid, Granular
-};
-
-class Ship {
+class Ship : public ScheduleItem {
 public:
     Ship(TypeOfCargo type, const std::string& name, int64_t weight, int64_t arrival);
 
+    Ship(const ScheduleItem& item);
+
     bool operator<(const Ship& other) const;
 
-    int64_t getUnloadTime() const;
-
-    int64_t getArrival() const;
-
-    int64_t getWeight() const;
-
-    std::string getName() const;
-
-    TypeOfCargo getType() const;
+    int64_t getFee() const;
 
     void setArrival(int64_t arrival);
 
     void setUnloadTime(int64_t unload_time);
 
+    void addToFee(int64_t delta);
+
 private:
-    TypeOfCargo type_;
-    std::string name_;
-    int64_t weight_, unload_time_, arrival_;
+    int64_t fee_;
 };
