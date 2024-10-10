@@ -29,7 +29,7 @@ class PortManagerWin {
         manager_->setCountLiquidCranes(cranes_counters[1]);
         manager_->setCountGranularCranes(cranes_counters[2]);
 
-        std::vector<Ship> ships;
+        std::vector<ScheduleItem> ships;
         auto ships_data = data_win->getShipsData();
         for (auto data: ships_data) {
             ships.emplace_back(TypeOfCargo(get<1>(data)), get<0>(data), get<2>(data), get<3>(data));
