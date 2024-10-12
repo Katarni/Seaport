@@ -188,7 +188,7 @@ class GetDataWin {
                 }
 
                 if (event.type == sf::Event::KeyReleased) {
-                    mouseButtonRealised(event);
+                    keyReleased(event);
                 }
             }
 
@@ -304,7 +304,7 @@ class GetDataWin {
         }
     }
 
-    void mouseButtonRealised(const sf::Event& event) {
+    void keyReleased(const sf::Event& event) {
         if (event.key.code == sf::Keyboard::RShift ||
             event.key.code == sf::Keyboard::LShift) {
             is_shift_ = false;

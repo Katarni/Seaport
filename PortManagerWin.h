@@ -234,6 +234,18 @@ class PortManagerWin {
             control_btns_[i]->setHeight(control_btns_imgs_[i]->getScaledHeight());
             control_btns_[i]->setWidth(control_btns_imgs_[i]->getScaledWidth());
         }
+
+        results_btn_ = new kat::Button;
+        results_btn_->setParent(window_);
+        results_btn_->setBackgroundColor(sf::Color(245, 208, 49));
+        results_btn_->setData("results");
+        results_btn_->setFont("../fonts/KodeMono.ttf");
+        results_btn_->setFontSize(16);
+        results_btn_->resize(80, 20);
+        results_btn_->setColor(sf::Color::White);
+        results_btn_->setX(800);
+        results_btn_->setY(5);
+        results_btn_->setBorderRadius(2);
     }
 
     void modeling() {
@@ -279,6 +291,11 @@ class PortManagerWin {
                             val->isSelected(static_cast<float>(event.mouseButton.x),
                                             static_cast<float>(event.mouseButton.y));
                         }
+                    }
+
+                    if (results_btn_->isPressed(static_cast<float>(event.mouseButton.x),
+                                                static_cast<float>(event.mouseButton.y))) {
+                        window_->close();
                     }
 
                     if (control_btns_[0]->isPressed(static_cast<float>(event.mouseButton.x),
@@ -350,6 +367,8 @@ class PortManagerWin {
                 control_btns_imgs_[i]->render();
             }
 
+            results_btn_->render();
+
             window_->display();
         }
     }
@@ -372,6 +391,8 @@ class PortManagerWin {
     std::vector<kat::Button*> control_btns_;
 
     kat::HorScrollArea *cranes_scroll_;
+
+    kat::Button *results_btn_;
 
     float max_crane_x_;
 
