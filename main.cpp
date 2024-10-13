@@ -3,6 +3,7 @@
 //
 
 #include "PortManagerWin.h"
+#include "results/ResultWin.h"
 
 int main() {
     auto get_data_win = new GetDataWin;
@@ -12,4 +13,7 @@ int main() {
     delete get_data_win;
 
     port_manager_win->modeling();
+
+    auto results_win = new ResultWin(port_manager_win->getManager());
+    results_win->open();
 }

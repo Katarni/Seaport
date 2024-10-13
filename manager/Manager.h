@@ -10,14 +10,19 @@ public:
 
     void modeling();
 
+    [[nodiscard]]
     int getCountOfShips() const;
 
+    [[nodiscard]]
     double getAverageWaitingTime() const;
 
-    int64_t getFine() const;
+    [[nodiscard]]
+    int64_t getFee() const;
 
+    [[nodiscard]]
     int64_t getMaxDelay() const;
 
+    [[nodiscard]]
     double getAverageDelay() const;
 
     double getAverageQueue();

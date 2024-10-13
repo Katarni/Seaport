@@ -24,7 +24,7 @@ double Manager::getAverageWaitingTime() const {
     return total_waiting_time_ / (1.0 * ships_.size());
 }
 
-int64_t Manager::getFine() const {
+int64_t Manager::getFee() const {
     return fee_;
 }
 

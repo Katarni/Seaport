@@ -373,6 +373,11 @@ class PortManagerWin {
         }
     }
 
+    [[nodiscard]]
+    Manager *getManager() const {
+        return manager_;
+    }
+
  private:
     int64_t time_;
     int width_, height_;
