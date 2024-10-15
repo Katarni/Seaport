@@ -7,6 +7,7 @@
 #include "header.h"
 #include "input-data/GetDataWin.h"
 #include "ships/DrawableShip.h"
+#include "DrawableScheduleItem.h"
 
 
 class PortManagerWin {
@@ -235,17 +236,49 @@ class PortManagerWin {
             control_btns_[i]->setWidth(control_btns_imgs_[i]->getScaledWidth());
         }
 
-        results_btn_ = new kat::Button;
-        results_btn_->setParent(window_);
+        schedule_btn_ = new kat::Button(window_);
+        schedule_btn_->setBackgroundColor(sf::Color(245, 208, 49));
+        schedule_btn_->setFont("../fonts/KodeMono.ttf");
+        schedule_btn_->setFontSize(16);
+        schedule_btn_->setData("s");
+        schedule_btn_->resize(20, 20);
+        schedule_btn_->setColor(sf::Color::White);
+        schedule_btn_->setX(15);
+        schedule_btn_->setY(5);
+        schedule_btn_->setBorderRadius(2);
+
+        results_btn_ = new kat::Button(window_);
         results_btn_->setBackgroundColor(sf::Color(245, 208, 49));
         results_btn_->setData("results");
         results_btn_->setFont("../fonts/KodeMono.ttf");
         results_btn_->setFontSize(16);
         results_btn_->resize(80, 20);
         results_btn_->setColor(sf::Color::White);
-        results_btn_->setX(800);
+        results_btn_->setX(45);
         results_btn_->setY(5);
         results_btn_->setBorderRadius(2);
+
+        schedule_title_ = new kat::Button(window_);
+        schedule_title_->resize(554, 43);
+        schedule_title_->setData("Schedule");
+        schedule_title_->setFont("../fonts/KodeMono.ttf");
+        schedule_title_->setFontSize(24);
+        schedule_title_->setX(346);
+
+        schedule_area_ = new kat::VerScrollArea(window_);
+        schedule_area_->resize(554, static_cast<float>(height_) - schedule_title_->getHeight());
+        schedule_area_->setX(346);
+        schedule_area_->setY(43);
+        schedule_area_->setCropBorders(true);
+
+        float last_y = 43;
+        for (const auto& item : manager_->getSchedule()) {
+            auto elm = new DrawableScheduleItem(item, window_);
+            elm->setY(last_y);
+            last_y += elm->getHeight() + 15;
+            elm->setX(378);
+            schedule_area_->addElm(elm);
+        }
     }
 
     void modeling() {
@@ -255,7 +288,7 @@ class PortManagerWin {
 
         forwardEvents();
 
-        bool pause_ = false;
+        bool pause = false, draw_schedule = false;
 
         while (window_->isOpen()) {
             sf::Event event{};
@@ -266,27 +299,39 @@ class PortManagerWin {
 
                 if (event.type == sf::Event::MouseWheelScrolled) {
                     if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-                        if (cranes_scroll_->moveAllX(event.mouseWheelScroll.delta)) {
-                            for (auto & [key, val] : ships_) {
-                                val->moveX(event.mouseWheelScroll.delta);
+                        if (!draw_schedule ||
+                            !schedule_area_->isHovered(static_cast<float>(event.mouseWheelScroll.x),
+                                                     static_cast<float>(event.mouseWheelScroll.y))) {
+                            if (cranes_scroll_->moveAllX(event.mouseWheelScroll.delta)) {
+                                for (auto & [key, val] : ships_) {
+                                    val->moveX(event.mouseWheelScroll.delta);
+                                }
+                                for (auto& elm : ships_at_queue_lbls_) {
+                                    elm->moveX(event.mouseWheelScroll.delta);
+                                }
                             }
+                        }
+                    } else if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
+                        if (draw_schedule && schedule_area_->isHovered(static_cast<float>(event.mouseWheelScroll.x),
+                                                          static_cast<float>(event.mouseWheelScroll.y))) {
+                            schedule_area_->moveAllY(static_cast<float>(kat::sign(event.mouseWheelScroll.delta) * 5));
                         }
                     }
                 }
 
                 if (event.type == sf::Event::KeyReleased) {
                     if (event.key.code == sf::Keyboard::Space) {
-                        if (pause_) {
+                        if (pause) {
                             control_btns_imgs_[1]->loadFromFile("../sprites/btns/pause.png");
                         } else {
                             control_btns_imgs_[1]->loadFromFile("../sprites/btns/play.png");
                         }
-                        pause_ = !pause_;
+                        pause = !pause;
                     }
                 }
 
                 if (event.type == sf::Event::MouseButtonReleased) {
-                    if (pause_) {
+                    if (pause) {
                         for (auto & [key, val] : ships_) {
                             val->isSelected(static_cast<float>(event.mouseButton.x),
                                             static_cast<float>(event.mouseButton.y));
@@ -296,6 +341,11 @@ class PortManagerWin {
                     if (results_btn_->isPressed(static_cast<float>(event.mouseButton.x),
                                                 static_cast<float>(event.mouseButton.y))) {
                         window_->close();
+                    }
+
+                    if (schedule_btn_->isPressed(static_cast<float>(event.mouseButton.x),
+                                                static_cast<float>(event.mouseButton.y))) {
+                        draw_schedule = !draw_schedule;
                     }
 
                     if (control_btns_[0]->isPressed(static_cast<float>(event.mouseButton.x),
@@ -310,12 +360,12 @@ class PortManagerWin {
 
                     if (control_btns_[1]->isPressed(static_cast<float>(event.mouseButton.x),
                                                     static_cast<float>(event.mouseButton.y))) {
-                        if (pause_) {
+                        if (pause) {
                             control_btns_imgs_[1]->loadFromFile("../sprites/btns/pause.png");
                         } else {
                             control_btns_imgs_[1]->loadFromFile("../sprites/btns/play.png");
                         }
-                        pause_ = !pause_;
+                        pause = !pause;
                     }
 
                     if (control_btns_[2]->isPressed(static_cast<float>(event.mouseButton.x),
@@ -342,7 +392,7 @@ class PortManagerWin {
                 }
             }
 
-            if (last_time + 1000 / 24 < getCurrTime() && !pause_) {
+            if (last_time + 1000 / 24 < getCurrTime() && !pause) {
                 last_time = getCurrTime();
                 ++time_;
                 forwardEvents();
@@ -368,6 +418,12 @@ class PortManagerWin {
             }
 
             results_btn_->render();
+            schedule_btn_->render();
+
+            if (draw_schedule) {
+                schedule_title_->render();
+                schedule_area_->render();
+            }
 
             window_->display();
         }
@@ -384,6 +440,8 @@ class PortManagerWin {
     sf::RenderWindow *window_;
     Manager *manager_;
 
+    kat::VerScrollArea *schedule_area_;
+
     std::vector<int> ships_at_queue_counters_;
     std::vector<kat::Label*> ships_at_queue_lbls_;
 
@@ -397,7 +455,7 @@ class PortManagerWin {
 
     kat::HorScrollArea *cranes_scroll_;
 
-    kat::Button *results_btn_;
+    kat::Button *results_btn_, *schedule_btn_, *schedule_title_;
 
     float max_crane_x_;
 

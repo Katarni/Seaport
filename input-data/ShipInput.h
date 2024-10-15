@@ -23,8 +23,7 @@ class ShipInput : public kat::TextInput {
         std::vector<std::string> lbls_text = {"name", "type", "weight", "arrival"},
                                 placeholders_text = {"random", "0", "1", "dd:hh:mm"};
         for (int i = 0; i < 4; ++i) {
-            labels_[i] = new kat::Label;
-            labels_[i]->setParent(getParent());
+            labels_[i] = new kat::Label(parent);
             labels_[i]->resize(lbls_width[i], 26);
             labels_[i]->setY(16);
             labels_[i]->setX(lbls_x[i]);
@@ -32,10 +31,9 @@ class ShipInput : public kat::TextInput {
             labels_[i]->setFontSize(20);
             labels_[i]->setFont(font);
 
-            inputs_[i] = new kat::TextInput;
-            inputs_[i]->setParent(getParent());
+            inputs_[i] = new kat::TextInput(parent);
             inputs_[i]->setBorderRadius(8);
-            inputs_[i]->setBorderColor(sf::Color(31, 184, 193));
+            inputs_[i]->setBorderColor(kBlue);
             inputs_[i]->setBorderBold(2);
             inputs_[i]->setPlaceHolder(placeholders_text[i]);
             inputs_[i]->setX(labels_[i]->getX() + labels_[i]->getWidth() + 3);

@@ -3,7 +3,7 @@
 int GetRandomFromRange(int64_t left, int64_t right) {
     std::random_device rd;
     std::mt19937 rng(rd());
-    return (int64_t) rng() % (right - left + 1) + left;
+    return static_cast<int>(rng() % (right - left + 1) + left);
 }
 
 Manager::Manager() {
@@ -13,6 +13,7 @@ Manager::Manager() {
     late_arrival_min_ = 0;
     late_arrival_max_ = 0;
     max_time_ = 0;
+    ptr_ = 0;
 }
 
 int Manager::getCountOfShips() const {
@@ -21,7 +22,7 @@ int Manager::getCountOfShips() const {
 
 double Manager::getAverageWaitingTime() const {
     if (getCountOfShips() == 0) return 0;
-    return total_waiting_time_ / (1.0 * ships_.size());
+    return static_cast<double>(total_waiting_time_) / static_cast<double>(ships_.size());
 }
 
 int64_t Manager::getFee() const {
@@ -34,7 +35,7 @@ int64_t Manager::getMaxDelay() const {
 
 double Manager::getAverageDelay() const {
     if (getCountOfShips() == 0) return 0;
-    return total_delay_ / (1.0 * ships_.size());
+    return static_cast<double>(total_delay_) / static_cast<double>(ships_.size());
 }
 
 void Manager::setDelayRange(int left, int right) {
@@ -173,7 +174,7 @@ double Manager::getAverageQueue() {
     int balance = 0;
     int64_t total_queue = 0;
     int cur_event = 0;
-    for (int i = events_[0].getTime(); i <= max_time_; ++i) {
+    for (int64_t i = events_[0].getTime(); i <= max_time_; ++i) {
         while (cur_event < events_.size() && events_[cur_event].getTime() == i) {
             if (events_[cur_event].getTypeOfEvent() == TypeOfEvent::ArrivalAtPort) {
                 ++balance;
@@ -184,7 +185,7 @@ double Manager::getAverageQueue() {
         }
         total_queue += balance;
     }
-    return total_queue / (1.0 * max_time_);
+    return static_cast<double>(total_queue) / static_cast<double>(max_time_);
 }
 
 void Manager::setEventTime(int time) {
