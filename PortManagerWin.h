@@ -27,11 +27,10 @@ class PortManagerWin {
         manager_->setCountLiquidCranes(cranes_counters[1]);
         manager_->setCountGranularCranes(cranes_counters[2]);
 
-        std::vector<ScheduleItem*> ships;
+        std::vector<ScheduleItem> ships;
         auto ships_data = data_win->getShipsData();
         for (auto data: ships_data) {
-            auto item = new ScheduleItem(TypeOfCargo(get<1>(data)), get<0>(data), get<2>(data), get<3>(data));
-            ships.push_back(item);
+            ships.emplace_back(TypeOfCargo(get<1>(data)), get<0>(data), get<2>(data), get<3>(data));
         }
         manager_->setShips(ships);
 
@@ -272,8 +271,8 @@ class PortManagerWin {
         schedule_area_->setCropBorders(true);
 
         float last_y = 43;
-        for (auto item : manager_->getSchedule()) {
-            schedule_idxs_[item->getName()] = schedule_area_->getElms().size();
+        for (const auto& item : manager_->getSchedule()) {
+            schedule_idxs_[item.getName()] = schedule_area_->getElms().size();
             auto elm = new DrawableScheduleItem(item, window_);
             elm->setY(last_y);
             last_y += elm->getHeight() + 15;

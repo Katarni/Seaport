@@ -135,14 +135,14 @@ void Manager::modeling() {
     ptr_ = 0;
 }
 
-void Manager::setShips(std::vector<ScheduleItem*>& items) {
+void Manager::setShips(std::vector<ScheduleItem>& items) {
     for (auto& item : items) {
         int64_t delay = GetRandomFromRange(delay_min_, delay_max_);
         int64_t late_arrival = GetRandomFromRange(late_arrival_min_,
                                                   late_arrival_max_);
-        delay = std::max(-item->getUnloadTime() + 1, delay);
-        late_arrival = std::max(-item->getArrival() + 1, late_arrival);
-        Ship ship(*item);
+        delay = std::max(-item.getUnloadTime() + 1, delay);
+        late_arrival = std::max(-item.getArrival() + 1, late_arrival);
+        Ship ship(item);
         ship.setArrival(late_arrival + ship.getArrival());
         total_delay_ += delay;
         max_delay_ = std::max(max_delay_, delay);
@@ -204,6 +204,6 @@ void Manager::setEventTime(int time) {
     ptr_ = right - 1;
 }
 
-std::vector<ScheduleItem*> &Manager::getSchedule() {
+std::vector<ScheduleItem> &Manager::getSchedule() {
     return schedule_;
 }

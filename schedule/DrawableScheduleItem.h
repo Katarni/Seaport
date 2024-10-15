@@ -9,7 +9,7 @@
 
 class DrawableScheduleItem : public kat::Div {
  public:
-    explicit DrawableScheduleItem(ScheduleItem* item, sf::RenderWindow* parent) : kat::Div(parent) {
+    explicit DrawableScheduleItem(const ScheduleItem& item, sf::RenderWindow* parent) : kat::Div(parent) {
         resize(472, 88);
         setBorderRadius(15);
         setBorderColor(kBlue);
@@ -42,11 +42,11 @@ class DrawableScheduleItem : public kat::Div {
             vals_[i]->setBorderColor(kBlue);
             vals_[i]->setBorderRadius(8);
         }
-        vals_[0]->setData(item->getName());
-        vals_[1]->setData(std::to_string(static_cast<int>(item->getType())));
-        vals_[2]->setData(std::to_string(item->getWeight()));
-        vals_[3]->setData(intToTime(item->getArrival()));
-        vals_[4]->setData(intToTime(item->getUnloadTime()));
+        vals_[0]->setData(item.getName());
+        vals_[1]->setData(std::to_string(static_cast<int>(item.getType())));
+        vals_[2]->setData(std::to_string(item.getWeight()));
+        vals_[3]->setData(intToTime(item.getArrival()));
+        vals_[4]->setData(intToTime(item.getUnloadTime()));
 
         unloaded_ = new kat::Label(parent);
         unloaded_->resize(20, 20);
