@@ -3,7 +3,7 @@
 //
 
 #include "PortManagerWin.h"
-#include "results/ResultWin.h"
+#include "ResultWin.h"
 
 int main() {
     auto get_data_win = new GetDataWin;

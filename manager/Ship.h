@@ -13,8 +13,10 @@ public:
     [[nodiscard]]
     int64_t getFee() const;
 
+    [[nodiscard]]
     int64_t getWaitingTime() const;
 
+    [[nodiscard]]
     int64_t getStartOfUnloading() const;
 
     void setArrival(int64_t arrival);

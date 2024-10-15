@@ -11,21 +11,23 @@
 
 ```mermaid
 graph BT;
+	DrawableScheduleItem-->kat::Div;
+	ShipInput-->kat::TextInput;
+	kat::TextInput-->something_in_KatLib;
+	something_in_KatLib-->kat::Div;
+	kat::Image-->kat::Div;
+	kat::ScrollArea-->kat::Div;
+	kat::VerScrollArea-->kat::ScrollArea;
 	ScheduleScroll-->kat::VerScrollArea;
 	DrawableShip-->kat::Image;
 ```
 
 ```mermaid
 graph BT;
-	DrawableScheduleItem-->kat::Div;
-	ShipInput-->kat::TextInput;
-```
-
-```mermaid
-graph BT;
 	MovingEvent;
 	GetDataWin;
-	PortManager;
+	PortManagerWin;   
+	ResultsWin;
 ```
 
 ### Backend
@@ -37,7 +39,55 @@ graph BT;
     Event;
 ```
 ## Текстовые спецификации основных классов системы
+
+## Frontend
+
+### ShipInput
+Обертка над четырьмя_ kat::TextInput*_ для удобного размещения этих объектов в _kat::VerScrollArea_. Унаследован от _kat::TextInput_ для того, чтобы дергать ф-ии полей класса из переопределенных методов базового
+Содержит поля ввода для:
++ Имя корабля
++ Тип груза корабля
++ Вес груза
++ Время планируемого прибытия
+### GetDataWin
+Окно ввода дынных:
++ Разброс случайных величин
++ Количество кранов каждого типа
++ Количество и данные по кораблям
+### DrawableScheduleItem
+Класс для отображаемого содержания. Является оберткой над _kat::Button*_ (для центрирования текста), унаследован от _kat::Div_, для возможности отображаться на экране.
+Содержит:
++ Флаг разгружен/не разгружен
++ Имя корабля
++ Тип груза корабля
++ Вес груза
++ Время планируемого прибытия
++ Предполагаемое время разгузки
+### ScheduleScroll
+Вынесен в отдельный класс чтобы добавить ф-ию _changeUnload(size_t)_ - по индексу меняет значение unload в i-ом _DrawableScheduleItem_ 
+
+### MovingEvent
+Событие перемещения из точки A в точку B в момент времени с _start_time_ по _end_time_. Поле _is_y_first_, отвечает за то, по какой координате начнется перемещение
++ Ф-ия _getCoorInTime(int64_t)_ возвращает координаты корабля в момент time(параметр), вернет {-1e5, -1e5}, если во время time перемещение еще не началось, и {1e5, 1e5}, если уже закончилось
++ Ф-ия _getEndPos()_ возвращает координаты в момент времени _end_time_. 
+### DrawableShip
+Отображаемый корабль. Наследован от _kat::Image_ для вывода на экран изображение. В конструкторе рандомно выбирает sprite корабля в зависимости от типа груза. Содержит _std::vector_ _MovingEvent_. С помощью ф-ии _updCoorInTime(int64_t time)_ рассчитывается позиция исходя из текущего времени (параметр) и данных из _MovingEvent_
+
+### PortManagerWin
+Основной класс интерфейса. Содержит поля, необходимые для отображения и объект класса _Manager_, а также следующие ф-ии:
+#### modeling()
+Ф-ия отрисовки. Так же обрабатывает все события пользователя: нажатие кнопки мыши, перемещение курсора и т.д.
+#### forwardEvents()
+Последовательно обрабатывает события из объекта класса _Manager_, для которых время меньше или равно текущему времени в моделировании. 
+#### convertEventToShip(const Event& event)
+Переводит объект типа event в объекты типа _DrawableShip_ и _MovingEvent_. 
+#### backwardEvent()
+Откатывает события из объекта класса _Manager_, пока время события больше, чем текущее временя в моделировании.
+#### rollbackEvent(const Event& event) 
+Выполняет ту же функцию, что и _convertEventToShip_, но в обратную сторону по линии времени, те откатывает изменения, сделаные в convertEventToShip
+
 ## Backend
+
 ### ScheduleItem
 Хранит информацию про запланированный приезд кораблей (расписание).
 #### Поля:

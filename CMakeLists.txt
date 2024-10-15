@@ -19,7 +19,7 @@ add_executable(PortManagerInterface main.cpp
         manager/ScheduleItem.h
         ships/DrawableShip.h
         ships/MovingEvent.h
-        results/ResultWin.h
+        ResultWin.h
         schedule/DrawableScheduleItem.h
         schedule/ScheduleScroll.h
 )
