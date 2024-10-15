@@ -62,7 +62,7 @@ void Manager::setCountLiquidCranes(int count) {
     count_liquid_cranes_ = count;
 }
 
-void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
+void Manager::modelingForOneType(std::vector<Ship*> &ships) {
     if (ships.empty()) return;
     std::sort(ships.begin(), ships.end());
     int64_t count_cranes;
@@ -97,14 +97,18 @@ void Manager::ModelingForOneType(std::vector<Ship*> &ships) {
         cranes.erase(cranes.begin());
         int64_t time_to_crane = kDistQueueFirst / kSpeedShip + id * kDistCranes / kSpeedShip;
         time = std::max(ship->getArrival(), time - time_to_crane);
-        fee_ += std::max(0ll, time - ship->getArrival()) * kFee;
-        ship->addToFee(std::max(0ll, time - ship->getArrival()) * kFee);
-        total_waiting_time_ += std::max(0ll, time - ship->getArrival());
+        auto fee = std::max(0ll, time - ship->getArrival()) * kFee;
+        fee_ += fee;
+        ship->addToFee(fee);
+        auto waiting_time = std::max(0ll, time - ship->getArrival());
+        total_waiting_time_ += waiting_time;
+        ship->setWaitingTime(waiting_time);
         events_.emplace_back(id, time,
                              TypeOfEvent::StartMovingToCrane,
                              ship);
         time += time_to_crane;
         time = std::max(time, ship->getArrival());
+        ship->setStartOfUnloading(time);
         events_.emplace_back(id, time,
                              TypeOfEvent::StartOfUnloading,
                              ship);
@@ -128,9 +132,9 @@ void Manager::modeling() {
             liquid_ships.push_back(&ship);
         }
     }
-    ModelingForOneType(container_ships);
-    ModelingForOneType(liquid_ships);
-    ModelingForOneType(granular_ships);
+    modelingForOneType(container_ships);
+    modelingForOneType(liquid_ships);
+    modelingForOneType(granular_ships);
     std::sort(events_.begin(), events_.end());
     ptr_ = 0;
 }

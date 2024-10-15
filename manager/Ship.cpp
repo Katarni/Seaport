@@ -33,3 +33,19 @@ Ship::Ship(const ScheduleItem& item) : ScheduleItem(item), fee_(0) {}
 void Ship::addToFee(int64_t delta) {
     fee_ += delta;
 }
+
+void Ship::setStartOfUnloading(int64_t time) {
+    start_of_unloading_ = time;
+}
+
+void Ship::setWaitingTime(int64_t time) {
+    waiting_time_ = time;
+}
+
+int64_t Ship::getStartOfUnloading() const {
+    return start_of_unloading_;
+}
+
+int64_t Ship::getWaitingTime() const {
+    return waiting_time_;
+}

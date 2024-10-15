@@ -13,12 +13,20 @@ public:
     [[nodiscard]]
     int64_t getFee() const;
 
+    int64_t getWaitingTime() const;
+
+    int64_t getStartOfUnloading() const;
+
     void setArrival(int64_t arrival);
 
     void setUnloadTime(int64_t unload_time);
 
+    void setStartOfUnloading(int64_t time);
+
+    void setWaitingTime(int64_t time);
+
     void addToFee(int64_t delta);
 
 private:
-    int64_t fee_;
+    int64_t fee_, start_of_unloading_, waiting_time_;
 };
