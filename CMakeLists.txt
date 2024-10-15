@@ -20,8 +20,8 @@ add_executable(PortManagerInterface main.cpp
         ships/DrawableShip.h
         ships/MovingEvent.h
         results/ResultWin.h
-        DrawableScheduleItem.h
-        ScheduleScroll.h
+        schedule/DrawableScheduleItem.h
+        schedule/ScheduleScroll.h
 )
 
 add_subdirectory(KatLib)
