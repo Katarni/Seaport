@@ -7,7 +7,7 @@
 
 int main() {
     auto get_data_win = new GetDataWin;
-    get_data_win->open();
+    if (!get_data_win->open()) return 0;
 
     auto port_manager_win = new PortManagerWin(get_data_win);
     delete get_data_win;

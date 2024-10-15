@@ -134,12 +134,13 @@ class GetDataWin {
         delete window_;
     }
 
-    void open() {
+    bool open() {
         while (window_->isOpen()) {
             sf::Event event{};
             while (window_->pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
                     window_->close();
+                    return 0;
                 }
 
                 if (event.type == sf::Event::MouseWheelMoved) {
@@ -173,8 +174,10 @@ class GetDataWin {
                     }
                     if (submit_btn_->isPressed(static_cast<float>(event.mouseButton.x),
                                                static_cast<float>(event.mouseButton.y))) {
-                        window_->close();
-                        return;
+                        if (!ships_scroll_area_->getElms().empty()) {
+                            window_->close();
+                            return 1;
+                        }
                     }
                     ships_scroll_area_->isPressed(static_cast<float>(event.mouseButton.x),
                                                   static_cast<float>(event.mouseButton.y));
@@ -215,6 +218,7 @@ class GetDataWin {
 
             window_->display();
         }
+        return 0;
     }
 
     std::vector<int> getCranesCounts() {
@@ -222,10 +226,6 @@ class GetDataWin {
         std::string data2 = counters_input_[1]->getData().empty() ? "1" : counters_input_[1]->getData();
         std::string data3 = counters_input_[2]->getData().empty() ? "1" : counters_input_[2]->getData();
         return {std::stoi(data1), std::stoi(data2), std::stoi(data3)};
-    }
-
-    int64_t getShipsCount() {
-        return std::stoll(counters_input_[3]->getData().empty() ? "0" : counters_input_[3]->getData());
     }
 
     std::vector<std::tuple<std::string, int64_t, int64_t, int64_t>> getShipsData() {
