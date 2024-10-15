@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "header.h"
 #include "input-data/GetDataWin.h"
 #include "ships/DrawableShip.h"
-#include "DrawableScheduleItem.h"
+#include "ScheduleScroll.h"
 
 
 class PortManagerWin {
@@ -28,10 +27,11 @@ class PortManagerWin {
         manager_->setCountLiquidCranes(cranes_counters[1]);
         manager_->setCountGranularCranes(cranes_counters[2]);
 
-        std::vector<ScheduleItem> ships;
+        std::vector<ScheduleItem*> ships;
         auto ships_data = data_win->getShipsData();
         for (auto data: ships_data) {
-            ships.emplace_back(TypeOfCargo(get<1>(data)), get<0>(data), get<2>(data), get<3>(data));
+            auto item = new ScheduleItem(TypeOfCargo(get<1>(data)), get<0>(data), get<2>(data), get<3>(data));
+            ships.push_back(item);
         }
         manager_->setShips(ships);
 
@@ -265,14 +265,15 @@ class PortManagerWin {
         schedule_title_->setFontSize(24);
         schedule_title_->setX(346);
 
-        schedule_area_ = new kat::VerScrollArea(window_);
+        schedule_area_ = new ScheduleScroll(window_);
         schedule_area_->resize(554, static_cast<float>(height_) - schedule_title_->getHeight());
         schedule_area_->setX(346);
         schedule_area_->setY(43);
         schedule_area_->setCropBorders(true);
 
         float last_y = 43;
-        for (const auto& item : manager_->getSchedule()) {
+        for (auto item : manager_->getSchedule()) {
+            schedule_idxs_[item->getName()] = schedule_area_->getElms().size();
             auto elm = new DrawableScheduleItem(item, window_);
             elm->setY(last_y);
             last_y += elm->getHeight() + 15;
@@ -440,12 +441,13 @@ class PortManagerWin {
     sf::RenderWindow *window_;
     Manager *manager_;
 
-    kat::VerScrollArea *schedule_area_;
+    ScheduleScroll *schedule_area_;
 
     std::vector<int> ships_at_queue_counters_;
     std::vector<kat::Label*> ships_at_queue_lbls_;
 
     std::map<Ship*, DrawableShip*> ships_;
+    std::map<std::string, size_t> schedule_idxs_;
 
     kat::Label *clock_lbl_;
     kat::Image *clock_truck_, *btns_truck_;
@@ -491,58 +493,67 @@ class PortManagerWin {
         float from_y, from_x, dis_x, dis_y;
         bool is_y_first;
 
-        if (event.getTypeOfEvent() == TypeOfEvent::ArrivalOnScreen) {
-            dis_y = 0;
-            dis_x = 144;
-            from_x = -77;
-            is_y_first = false;
+        switch (event.getTypeOfEvent()) {
+            case TypeOfEvent::ArrivalOnScreen:
+                dis_y = 0;
+                dis_x = 144;
+                from_x = -77;
+                is_y_first = false;
 
-            if (event.getShip()->getType() == TypeOfCargo::Container) {
-                from_y = 139;
-            } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
-                from_y = static_cast<float>(height_) - 162;
-            } else {
-                from_y = 222;
-            }
+                if (event.getShip()->getType() == TypeOfCargo::Container) {
+                    from_y = 139;
+                } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
+                    from_y = static_cast<float>(height_) - 162;
+                } else {
+                    from_y = 222;
+                }
 
-            ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
-        } else if (event.getTypeOfEvent() == TypeOfEvent::StartMovingToCrane) {
-            ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] -= 1;
+                ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
+                break;
+            case TypeOfEvent::StartMovingToCrane:
+                ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] -= 1;
 
-            is_y_first = false;
-            from_x = 77;
-            dis_x = static_cast<float>(56 + 128 * (event.getIdCrane() + 1));
-            dis_y = 22;
+                is_y_first = false;
+                from_x = 77;
+                dis_x = static_cast<float>(56 + 128 * (event.getIdCrane() + 1));
+                dis_y = 22;
 
-            if (event.getShip()->getType() == TypeOfCargo::Container) {
-                from_y = 139;
-                dis_y *= -1;
-            } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
-                from_y = static_cast<float>(height_) - 162;
-            } else {
-                from_y = 222;
-            }
+                if (event.getShip()->getType() == TypeOfCargo::Container) {
+                    from_y = 139;
+                    dis_y *= -1;
+                } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
+                    from_y = static_cast<float>(height_) - 162;
+                } else {
+                    from_y = 222;
+                }
 
-            ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
-        } else if (event.getTypeOfEvent() == TypeOfEvent::FinishOfUnloading) {
-            from_x = static_cast<float>(143 + 128 * (event.getIdCrane() + 1));
-            is_y_first = true;
-            dis_y = -22;
+                ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
+                break;
+            case TypeOfEvent::FinishOfUnloading:
+                schedule_area_->changeUnload(schedule_idxs_[event.getShip()->getName()]);
 
-            if (event.getShip()->getType() == TypeOfCargo::Container) {
-                from_y = 117;
-                dis_y *= -1;
-            } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
-                from_y = static_cast<float>(height_) - 140;
-            } else {
-                from_y = 244;
-            }
+                from_x = static_cast<float>(143 + 128 * (event.getIdCrane() + 1));
+                is_y_first = true;
+                dis_y = -22;
 
-            dis_x = std::max(max_crane_x_ + 280, static_cast<float>(width_));
+                if (event.getShip()->getType() == TypeOfCargo::Container) {
+                    from_y = 117;
+                    dis_y *= -1;
+                } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
+                    from_y = static_cast<float>(height_) - 140;
+                } else {
+                    from_y = 244;
+                }
 
-            ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
-        } else if (event.getTypeOfEvent() == TypeOfEvent::ArrivalAtPort) {
-            ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] += 1;
+                dis_x = std::max(max_crane_x_ + 280, static_cast<float>(width_));
+
+                ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
+                break;
+            case TypeOfEvent::ArrivalAtPort:
+                ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] += 1;
+                break;
+            default:
+                break;
         }
     }
 
@@ -555,6 +566,8 @@ class PortManagerWin {
         } else if (event.getTypeOfEvent() == TypeOfEvent::StartMovingToCrane) {
             ships_[event.getShip()]->popBack();
             ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] += 1;
+        } else if (event.getTypeOfEvent() == TypeOfEvent::FinishOfUnloading) {
+            schedule_area_->changeUnload(schedule_idxs_[event.getShip()->getName()]);
         }
     }
 };

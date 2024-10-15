@@ -9,7 +9,7 @@
 
 class DrawableScheduleItem : public kat::Div {
  public:
-    explicit DrawableScheduleItem(const ScheduleItem& item, sf::RenderWindow* parent) : kat::Div(parent) {
+    explicit DrawableScheduleItem(ScheduleItem* item, sf::RenderWindow* parent) : kat::Div(parent) {
         resize(472, 88);
         setBorderRadius(15);
         setBorderColor(kBlue);
@@ -42,11 +42,19 @@ class DrawableScheduleItem : public kat::Div {
             vals_[i]->setBorderColor(kBlue);
             vals_[i]->setBorderRadius(8);
         }
-        vals_[0]->setData(item.getName());
-        vals_[1]->setData(std::to_string(static_cast<int>(item.getType())));
-        vals_[2]->setData(std::to_string(item.getWeight()));
-        vals_[3]->setData(intToTime(item.getArrival()));
-        vals_[4]->setData(intToTime(item.getUnloadTime()));
+        vals_[0]->setData(item->getName());
+        vals_[1]->setData(std::to_string(static_cast<int>(item->getType())));
+        vals_[2]->setData(std::to_string(item->getWeight()));
+        vals_[3]->setData(intToTime(item->getArrival()));
+        vals_[4]->setData(intToTime(item->getUnloadTime()));
+
+        unloaded_ = new kat::Label(parent);
+        unloaded_->resize(20, 20);
+        unloaded_->setX(10);
+        unloaded_->setY(34);
+        unloaded_->setBorderRadius(7);
+        unloaded_->setBorderBold(1);
+        unloaded_->setBorderColor(kBlue);
     }
 
     void render() override {
@@ -68,8 +76,23 @@ class DrawableScheduleItem : public kat::Div {
             elm->moveX(-getX());
             elm->moveY(-getY());
         }
+
+        unloaded_->moveX(getX());
+        unloaded_->moveY(getY());
+        unloaded_->render();
+        unloaded_->moveX(-getX());
+        unloaded_->moveY(-getY());
+    }
+
+    void changeUnload() {
+        if (unloaded_->getColor() == kBlue) {
+            unloaded_->setBackgroundColor(sf::Color::White);
+        } else {
+            unloaded_->setBackgroundColor(kBlue);
+        }
     }
 
  private:
     std::vector<kat::Button*> labels_, vals_;
+    kat::Label *unloaded_;
 };

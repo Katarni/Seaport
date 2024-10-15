@@ -6,10 +6,11 @@ class Ship : public ScheduleItem {
 public:
     Ship(TypeOfCargo type, const std::string& name, int64_t weight, int64_t arrival);
 
-    Ship(const ScheduleItem& item);
+    explicit Ship(const ScheduleItem& item);
 
     bool operator<(const Ship& other) const;
 
+    [[nodiscard]]
     int64_t getFee() const;
 
     void setArrival(int64_t arrival);
