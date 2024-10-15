@@ -48,7 +48,7 @@ public:
 
 
 private:
-    void ModelingForOneType(std::vector<Ship*>& ships);
+    void modelingForOneType(std::vector<Ship*>& ships);
 
     std::vector<Ship> ships_;
     std::vector<Event> events_;
