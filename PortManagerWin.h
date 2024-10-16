@@ -599,8 +599,7 @@ class PortManagerWin {
     void rollbackEvent(const Event& event) {
         if (event.getTypeOfEvent() == TypeOfEvent::ArrivalAtPort) {
             ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] -= 1;
-        } else if (event.getTypeOfEvent() == TypeOfEvent::FinishOfUnloading ||
-                event.getTypeOfEvent() == TypeOfEvent::ArrivalOnScreen) {
+        } else if (event.getTypeOfEvent() == TypeOfEvent::ArrivalOnScreen) {
             ships_[event.getShip()]->popBack();
         } else if (event.getTypeOfEvent() == TypeOfEvent::StartMovingToCrane) {
             ships_[event.getShip()]->popBack();
@@ -608,6 +607,7 @@ class PortManagerWin {
         } else if (event.getTypeOfEvent() == TypeOfEvent::FinishOfUnloading) {
             schedule_area_->changeUnload(schedule_idxs_[event.getShip()->getName()]);
             unloaded_ships_scroll_->popBack();
+            ships_[event.getShip()]->popBack();
         }
     }
 };

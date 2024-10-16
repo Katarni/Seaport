@@ -12,6 +12,7 @@
 ```mermaid
 graph BT;
 	DrawableScheduleItem-->kat::Div;
+	UnloadedItem-->kat::Div;
 	ShipInput-->kat::TextInput;
 	kat::TextInput-->something_in_KatLib;
 	something_in_KatLib-->kat::Div;
@@ -54,14 +55,22 @@ graph BT;
 + Количество кранов каждого типа
 + Количество и данные по кораблям
 #### DrawableScheduleItem
-Класс для отображаемого содержания. Является оберткой над _kat::Button*_ (для центрирования текста), унаследован от _kat::Div_, для возможности отображаться на экране.
+Класс для отображаемого содержания расписания. Является оберткой над _kat::Button*_ (для центрирования текста), унаследован от _kat::Div_, для возможности отображаться на экране.
 Содержит:
 + Флаг разгружен/не разгружен
 + Имя корабля
 + Тип груза корабля
 + Вес груза
 + Время планируемого прибытия
-+ Предполагаемое время разгузки
++ Предполагаемое время разгрузки
+#### UnloadedItem
+Класс для отображаемого содержания разгруженных кораблей. Является оберткой над _kat::Button*_ (для центрирования текста), унаследован от _kat::Div_, для возможности отображаться на экране.
+Содержит:
++ Имя корабля
++ Фактическое время прибытия
++ Время ожидания в очереди
++ Время начала разгрузки
++ Фактическое время разгрузки
 #### ScheduleScroll
 Вынесен в отдельный класс чтобы добавить ф-ию _changeUnload(size_t)_ - по индексу меняет значение unload в i-ом _DrawableScheduleItem_ 
 #### MovingEvent
@@ -187,6 +196,7 @@ graph TD;
 	subgraph frontend
 		KatLIb-->header.h
 		header.h-->MovingEvent.h
+		header.h-->UnloadedItem.h
 		MovingEvent.h-->DrawableShip.h
 		header.h-->DrawableScheduleItem.h
 		DrawableScheduleItem.h-->ScheduleScroll.h
@@ -195,6 +205,7 @@ graph TD;
 		GetDataWin.h-->PortManagerWin.h
 		ScheduleScroll.h-->PortManagerWin.h
 		DrawableShip.h-->PortManagerWin.h
+		UnloadedItem.h-->PortManagerWin.h
 	end
 	Manager.h-->header.h
 ```
