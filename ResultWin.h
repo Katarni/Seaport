@@ -53,8 +53,8 @@ class ResultWin {
             results_data_[i]->setParent(window_);
             results_data_[i]->setFontSize(25);
             results_data_[i]->setFont("../fonts/KodeMono.ttf");
-            results_data_[i]->setX(static_cast<float>((width_ / 2.0 - 50) / 2 + width_ / 2.0) - 50);
-            results_data_[i]->resize(150, 30);
+            results_data_[i]->setX(static_cast<float>((width_ / 2.0 - 75) / 2 + width_ / 2.0) - 50);
+            results_data_[i]->resize(200, 30);
             if (i == 0) {
                 results_data_[i]->setY(140);
             } else {
