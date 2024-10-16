@@ -1,27 +1,11 @@
 #include "Ship.h"
 
-std::string generateName() {
-    std::random_device rd;
-    std::mt19937 rng(rd());
-    std::string chars = "abcdefghijklmnopqrstuvwxyz1234567890";
-    int sz = static_cast<int>(chars.size());
-    std::string res;
-    for (int i = 0; i < 6; ++i) res += chars[rng() % sz];
-    return res;
-}
 
-Ship::Ship(TypeOfCargo type, const std::string& name,
-    int64_t weight, int64_t time, int64_t arrival)
-    : type_(type),
-      name_(name),
-      weight_(weight),
-      unload_time_(time), arrival_(arrival) {
-    if (name_.empty()) {
-        name_ = generateName();
-    }
-}
+Ship::Ship(TypeOfCargo type, const std::string &name,
+           int64_t weight, int64_t arrival)
+        : ScheduleItem(type, name, weight, arrival) {}
 
-bool Ship::operator<(const Ship& other) const {
+bool Ship::operator<(const Ship &other) const {
     if (arrival_ != other.arrival_) {
         return arrival_ < other.arrival_;
     }
@@ -31,30 +15,36 @@ bool Ship::operator<(const Ship& other) const {
     return name_ < other.name_;
 }
 
-std::string Ship::getName() const {
-    return name_;
-}
-
-int64_t Ship::getUnloadTime() const {
-    return unload_time_;
-}
-
-int64_t Ship::getArrival() const {
-    return arrival_;
-}
-
-TypeOfCargo Ship::getType() const {
-    return type_;
-}
-
-int64_t Ship::getWeight() const {
-    return weight_;
-}
-
 void Ship::setArrival(int64_t arrival) {
     arrival_ = arrival;
 }
 
 void Ship::setUnloadTime(int64_t unload_time) {
     unload_time_ = unload_time;
+}
+
+int64_t Ship::getFee() const {
+    return fee_;
+}
+
+Ship::Ship(const ScheduleItem &item) : ScheduleItem(item), fee_(0) {}
+
+void Ship::addToFee(int64_t delta) {
+    fee_ += delta;
+}
+
+void Ship::setStartOfUnloading(int64_t time) {
+    start_of_unloading_ = time;
+}
+
+void Ship::setWaitingTime(int64_t time) {
+    waiting_time_ = time;
+}
+
+int64_t Ship::getStartOfUnloading() const {
+    return start_of_unloading_;
+}
+
+int64_t Ship::getWaitingTime() const {
+    return waiting_time_;
 }

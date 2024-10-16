@@ -22,7 +22,7 @@ int Event::getIdCrane() const {
     return id_crane_;
 }
 
-Ship* Event::getShip() const {
+Ship *Event::getShip() const {
     return ship_;
 }
 

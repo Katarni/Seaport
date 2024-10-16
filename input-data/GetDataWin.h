@@ -43,8 +43,10 @@ class GetDataWin {
             random_limits_input_[i]->setBorderRadius(15);
             random_limits_input_[i]->setBorderColor(kBlue);
             random_limits_input_[i]->setBorderBold(2);
-            random_limits_input_[i]->setX(425 + static_cast<float>(i % 2) * (55 + random_limits_input_[i]->getWidth()));
-            random_limits_input_[i]->setY(52 + static_cast<float>(i > 1) * (33 + random_limits_input_[i]->getHeight()));
+            random_limits_input_[i]->setX(425 + static_cast<float>(i % 2) *
+                                                    (55 + random_limits_input_[i]->getWidth()));
+            random_limits_input_[i]->setY(52 + static_cast<float>(i > 1) *
+                                                    (33 + random_limits_input_[i]->getHeight()));
         }
 
         counters_lbl_.resize(4);
@@ -79,6 +81,7 @@ class GetDataWin {
         }
 
         ships_scroll_area_ = new kat::VerScrollArea(83, 226, 657, 360, window_);
+        ships_scroll_area_->setCropBorders(true);
 
         ships_btns_.resize(2);
         for (int i = 0; i < 2; ++i) {
@@ -131,12 +134,13 @@ class GetDataWin {
         delete window_;
     }
 
-    void open() {
+    bool open() {
         while (window_->isOpen()) {
             sf::Event event{};
             while (window_->pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
                     window_->close();
+                    return 0;
                 }
 
                 if (event.type == sf::Event::MouseWheelMoved) {
@@ -170,8 +174,10 @@ class GetDataWin {
                     }
                     if (submit_btn_->isPressed(static_cast<float>(event.mouseButton.x),
                                                static_cast<float>(event.mouseButton.y))) {
-                        window_->close();
-                        return;
+                        if (!ships_scroll_area_->getElms().empty()) {
+                            window_->close();
+                            return 1;
+                        }
                     }
                     ships_scroll_area_->isPressed(static_cast<float>(event.mouseButton.x),
                                                   static_cast<float>(event.mouseButton.y));
@@ -185,7 +191,7 @@ class GetDataWin {
                 }
 
                 if (event.type == sf::Event::KeyReleased) {
-                    mouseButtonRealised(event);
+                    keyReleased(event);
                 }
             }
 
@@ -212,6 +218,38 @@ class GetDataWin {
 
             window_->display();
         }
+        return 0;
+    }
+
+    std::vector<int> getCranesCounts() {
+        std::string data1 = counters_input_[0]->getData().empty() ? "1" : counters_input_[0]->getData();
+        std::string data2 = counters_input_[1]->getData().empty() ? "1" : counters_input_[1]->getData();
+        std::string data3 = counters_input_[2]->getData().empty() ? "1" : counters_input_[2]->getData();
+        return {std::stoi(data1), std::stoi(data2), std::stoi(data3)};
+    }
+
+    std::vector<std::tuple<std::string, int64_t, int64_t, int64_t>> getShipsData() {
+        std::vector<std::tuple<std::string, int64_t, int64_t, int64_t>> data;
+        for (auto& elm : ships_scroll_area_->getElms()) {
+            auto ship = dynamic_cast<ShipInput*>(elm);
+            data.emplace_back(ship->getName(), ship->getType(), ship->getWeight(), ship->getTime());
+        }
+
+        return data;
+    }
+
+    std::pair<int, int> getDelayLimits() {
+        std::string data1 = random_limits_input_[0]->getData().empty() ? "0" : random_limits_input_[0]->getData();
+        std::string data2 = random_limits_input_[1]->getData().empty() ? "0" : random_limits_input_[1]->getData();
+        return {std::min(std::stoi(data1), std::stoi(data2)),
+                std::max(std::stoi(data1), std::stoi(data2))};
+    }
+
+    std::pair<int, int> getDeviationLimits() {
+        std::string data1 = random_limits_input_[2]->getData().empty() ? "0" : random_limits_input_[2]->getData();
+        std::string data2 = random_limits_input_[3]->getData().empty() ? "0" : random_limits_input_[3]->getData();
+        return {std::min(std::stoi(data1), std::stoi(data2)),
+                std::max(std::stoi(data1), std::stoi(data2))};
     }
 
  private:
@@ -266,7 +304,7 @@ class GetDataWin {
         }
     }
 
-    void mouseButtonRealised(const sf::Event& event) {
+    void keyReleased(const sf::Event& event) {
         if (event.key.code == sf::Keyboard::RShift ||
             event.key.code == sf::Keyboard::LShift) {
             is_shift_ = false;
@@ -325,6 +363,7 @@ class GetDataWin {
         for (auto& elm : counters_input_) {
             if (!elm->isSelected()) continue;
             if (elm->getData().size() >= 2) continue;
+            if (event_char == '0' && elm->getData().empty()) continue;
 
             if ('0' <= event_char && event_char <= '9') {
                 elm->addCharacter(event_char);

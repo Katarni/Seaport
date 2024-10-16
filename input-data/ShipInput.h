@@ -21,10 +21,9 @@ class ShipInput : public kat::TextInput {
         std::vector<float> lbls_width = {48, 48, 72, 84}, lbls_x = {18, 182, 275, 412},
                             inputs_width = {105, 34, 54, 105};
         std::vector<std::string> lbls_text = {"name", "type", "weight", "arrival"},
-                                placeholders_text = {"random", "1", "1", "dd:hh:mm"};
+                                placeholders_text = {"random", "0", "1", "dd:hh:mm"};
         for (int i = 0; i < 4; ++i) {
-            labels_[i] = new kat::Label;
-            labels_[i]->setParent(getParent());
+            labels_[i] = new kat::Label(parent);
             labels_[i]->resize(lbls_width[i], 26);
             labels_[i]->setY(16);
             labels_[i]->setX(lbls_x[i]);
@@ -32,10 +31,9 @@ class ShipInput : public kat::TextInput {
             labels_[i]->setFontSize(20);
             labels_[i]->setFont(font);
 
-            inputs_[i] = new kat::TextInput;
-            inputs_[i]->setParent(getParent());
+            inputs_[i] = new kat::TextInput(parent);
             inputs_[i]->setBorderRadius(8);
-            inputs_[i]->setBorderColor(sf::Color(31, 184, 193));
+            inputs_[i]->setBorderColor(kBlue);
             inputs_[i]->setBorderBold(2);
             inputs_[i]->setPlaceHolder(placeholders_text[i]);
             inputs_[i]->setX(labels_[i]->getX() + labels_[i]->getWidth() + 3);
@@ -164,6 +162,49 @@ class ShipInput : public kat::TextInput {
                 inputs_[3]->addCharacter(character);
             }
         }
+    }
+
+    std::string getName() {
+        return inputs_[0]->getData();
+    }
+
+    int64_t getTime() {
+        std::string time_s;
+        if (inputs_[3]->getData().size() < 8) {
+            time_s = "00:00:00";
+        }
+        time_s = inputs_[3]->getData();
+        time_s.push_back(':');
+
+        int64_t time = 0, mul = 60 * 24, cur = 0;
+        int i = 0;
+        for (char c : time_s) {
+            if (c == ':') {
+                time += cur * mul;
+                mul /= (i == 0) ? 24 : 60;
+                ++i;
+                cur = 0;
+                continue;
+            }
+
+            cur = cur * 10 + c - '0';
+        }
+
+        return time;
+    }
+
+    int64_t getType() {
+        if (inputs_[1]->getData().empty()) {
+            return 0;
+        }
+        return std::stoll(inputs_[1]->getData());
+    }
+
+    int64_t getWeight() {
+        if (inputs_[2]->getData().empty()) {
+            return 1;
+        }
+        return std::stoll(inputs_[2]->getData());
     }
 
  private:
