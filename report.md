@@ -169,3 +169,33 @@ graph BT;
 + Средняя задержка разгрузки
 + Суммарный штраф
 соответственно
+
+## Дерево зависимостей
+
+```mermaid
+graph TD;
+	subgraph frontend
+		KatLIb-->header.h
+		header.h-->MovingEvent.h
+		MovingEvent.h-->DrawableShip.h
+		header.h-->DrawableScheduleItem.h
+		DrawableScheduleItem.h-->ScheduleScroll.h
+		header.h-->ShipInput.h
+		ShipInput.h-->GetDataWin.h
+		GetDataWin.h-->PortManagerWin.h
+		ScheduleScroll.h-->PortManagerWin.h
+		DrawableShip.h-->PortManagerWin.h
+	end
+	subgraph backend
+		includes.h-->ScheduleItem.h
+		ScheduleItem.h-->ScheduleItem.cpp
+		ScheduleItem.h-->Ship.h
+		Ship.h-->Ship.cpp
+		Ship.h-->Event.h
+		Event.h-->Event.cpp
+		Manager.h-->Manager.cpp
+		Event.h-->Manager.h
+	end
+	Manager.h-->header.h
+```
+

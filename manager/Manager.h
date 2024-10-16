@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Ship.h"
 #include "Event.h"
 
 class Manager {
