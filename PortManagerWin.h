@@ -513,8 +513,6 @@ class PortManagerWin {
     }
 
     void backwardEvent() {
-        if (time_ < manager_->getCur().getTime() && manager_->goPrev()) return;
-
         while (time_ < manager_->getCur().getTime()) {
             rollbackEvent(manager_->getCur());
             ended_ = false;
