@@ -35,7 +35,6 @@ class DrawableScheduleItem : public kat::Div {
             vals_[i]->setFont("../fonts/KodeMono.ttf");
             vals_[i]->setFontSize(18);
             vals_[i]->setY(labels_[i]->getY());
-            vals_[i]->setData(lbls_text[i]);
             vals_[i]->resize(vals_width[i], 26);
             vals_[i]->setX(labels_[i]->getX() + labels_[i]->getWidth() + 3);
             vals_[i]->setBorderBold(2);

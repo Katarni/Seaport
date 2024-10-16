@@ -7,11 +7,13 @@
 #include "input-data/GetDataWin.h"
 #include "ships/DrawableShip.h"
 #include "schedule/ScheduleScroll.h"
+#include "schedule/UnloadedItem.h"
 
 
 class PortManagerWin {
  public:
     explicit PortManagerWin(GetDataWin *data_win) {
+        ended_ = false;
         width_ = 900, height_ = 700;
         window_ = new sf::RenderWindow(sf::VideoMode(width_, height_), "Modeling");
         time_ = -1e18;
@@ -235,6 +237,17 @@ class PortManagerWin {
             control_btns_[i]->setWidth(control_btns_imgs_[i]->getScaledWidth());
         }
 
+        unloaded_btn_ = new kat::Button(window_);
+        unloaded_btn_->setBackgroundColor(sf::Color(245, 208, 49));
+        unloaded_btn_->setData("u");
+        unloaded_btn_->setFont("../fonts/KodeMono.ttf");
+        unloaded_btn_->setFontSize(16);
+        unloaded_btn_->resize(20, 20);
+        unloaded_btn_->setColor(sf::Color::White);
+        unloaded_btn_->setX(15);
+        unloaded_btn_->setY(5);
+        unloaded_btn_->setBorderRadius(2);
+
         schedule_btn_ = new kat::Button(window_);
         schedule_btn_->setBackgroundColor(sf::Color(245, 208, 49));
         schedule_btn_->setFont("../fonts/KodeMono.ttf");
@@ -242,7 +255,7 @@ class PortManagerWin {
         schedule_btn_->setData("s");
         schedule_btn_->resize(20, 20);
         schedule_btn_->setColor(sf::Color::White);
-        schedule_btn_->setX(15);
+        schedule_btn_->setX(45);
         schedule_btn_->setY(5);
         schedule_btn_->setBorderRadius(2);
 
@@ -253,22 +266,28 @@ class PortManagerWin {
         results_btn_->setFontSize(16);
         results_btn_->resize(80, 20);
         results_btn_->setColor(sf::Color::White);
-        results_btn_->setX(45);
+        results_btn_->setX(75);
         results_btn_->setY(5);
         results_btn_->setBorderRadius(2);
 
-        schedule_title_ = new kat::Button(window_);
-        schedule_title_->resize(554, 43);
-        schedule_title_->setData("Schedule");
-        schedule_title_->setFont("../fonts/KodeMono.ttf");
-        schedule_title_->setFontSize(24);
-        schedule_title_->setX(346);
+        scroll_areas_title_ = new kat::Button(window_);
+        scroll_areas_title_->resize(554, 43);
+        scroll_areas_title_->setData("Schedule");
+        scroll_areas_title_->setFont("../fonts/KodeMono.ttf");
+        scroll_areas_title_->setFontSize(24);
+        scroll_areas_title_->setX(346);
 
         schedule_area_ = new ScheduleScroll(window_);
-        schedule_area_->resize(554, static_cast<float>(height_) - schedule_title_->getHeight());
+        schedule_area_->resize(554, static_cast<float>(height_) - scroll_areas_title_->getHeight());
         schedule_area_->setX(346);
         schedule_area_->setY(43);
         schedule_area_->setCropBorders(true);
+
+        unloaded_ships_scroll_ = new kat::VerScrollArea(window_);
+        unloaded_ships_scroll_->resize(554, static_cast<float>(height_) - scroll_areas_title_->getHeight());
+        unloaded_ships_scroll_->setX(346);
+        unloaded_ships_scroll_->setY(43);
+        unloaded_ships_scroll_->setCropBorders(true);
 
         float last_y = 43;
         for (const auto& item : manager_->getSchedule()) {
@@ -279,6 +298,8 @@ class PortManagerWin {
             elm->setX(378);
             schedule_area_->addElm(elm);
         }
+
+        last_unloaded_ship_y_ = 43;
     }
 
     void modeling() {
@@ -288,7 +309,7 @@ class PortManagerWin {
 
         forwardEvents();
 
-        bool pause = false, draw_schedule = false;
+        bool pause = false, draw_schedule = false, draw_unloaded = false;
 
         while (window_->isOpen()) {
             sf::Event event{};
@@ -346,6 +367,15 @@ class PortManagerWin {
                     if (schedule_btn_->isPressed(static_cast<float>(event.mouseButton.x),
                                                 static_cast<float>(event.mouseButton.y))) {
                         draw_schedule = !draw_schedule;
+                        draw_unloaded = false;
+                        scroll_areas_title_->setData("Schedule");
+                    }
+
+                    if (unloaded_btn_->isPressed(static_cast<float>(event.mouseButton.x),
+                                                 static_cast<float>(event.mouseButton.y))) {
+                        draw_unloaded = !draw_unloaded;
+                        draw_schedule = false;
+                        scroll_areas_title_->setData("Unloaded");
                     }
 
                     if (control_btns_[0]->isPressed(static_cast<float>(event.mouseButton.x),
@@ -417,12 +447,18 @@ class PortManagerWin {
                 control_btns_imgs_[i]->render();
             }
 
+            unloaded_btn_->render();
             results_btn_->render();
             schedule_btn_->render();
 
+            if (draw_schedule || draw_unloaded) {
+                scroll_areas_title_->render();
+            }
             if (draw_schedule) {
-                schedule_title_->render();
                 schedule_area_->render();
+            }
+            if (draw_unloaded) {
+                unloaded_ships_scroll_->render();
             }
 
             window_->display();
@@ -436,11 +472,15 @@ class PortManagerWin {
 
  private:
     int64_t time_;
+    bool ended_;
     int width_, height_;
+    float last_unloaded_ship_y_;
     sf::RenderWindow *window_;
     Manager *manager_;
 
     ScheduleScroll *schedule_area_;
+    kat::HorScrollArea *cranes_scroll_;
+    kat::VerScrollArea *unloaded_ships_scroll_;
 
     std::vector<int> ships_at_queue_counters_;
     std::vector<kat::Label*> ships_at_queue_lbls_;
@@ -454,9 +494,7 @@ class PortManagerWin {
     std::vector<kat::Image*> control_btns_imgs_;
     std::vector<kat::Button*> control_btns_;
 
-    kat::HorScrollArea *cranes_scroll_;
-
-    kat::Button *results_btn_, *schedule_btn_, *schedule_title_;
+    kat::Button *results_btn_, *schedule_btn_, *scroll_areas_title_, *unloaded_btn_;
 
     float max_crane_x_;
 
@@ -468,9 +506,9 @@ class PortManagerWin {
             manager_->goNext();
         }
 
-        while (time_ >= manager_->getCur().getTime()) {
+        while (!ended_ && time_ >= manager_->getCur().getTime()) {
             convertEventToShip(manager_->getCur());
-            if (manager_->goNext()) break;
+            ended_ = manager_->goNext();
         }
     }
 
@@ -479,6 +517,7 @@ class PortManagerWin {
 
         while (time_ < manager_->getCur().getTime()) {
             rollbackEvent(manager_->getCur());
+            ended_ = false;
             if (manager_->goPrev()) break;
         }
     }
@@ -492,24 +531,23 @@ class PortManagerWin {
         float from_y, from_x, dis_x, dis_y;
         bool is_y_first;
 
-        switch (event.getTypeOfEvent()) {
-            case TypeOfEvent::ArrivalOnScreen:
-                dis_y = 0;
-                dis_x = 144;
-                from_x = -77;
-                is_y_first = false;
 
-                if (event.getShip()->getType() == TypeOfCargo::Container) {
-                    from_y = 139;
-                } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
-                    from_y = static_cast<float>(height_) - 162;
-                } else {
-                    from_y = 222;
-                }
+        if (event.getTypeOfEvent() == TypeOfEvent::ArrivalOnScreen) {
+            dis_y = 0;
+            dis_x = 144;
+            from_x = -77;
+            is_y_first = false;
 
-                ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
-                break;
-            case TypeOfEvent::StartMovingToCrane:
+            if (event.getShip()->getType() == TypeOfCargo::Container) {
+                from_y = 139;
+            } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
+                from_y = static_cast<float>(height_) - 162;
+            } else {
+                from_y = 222;
+            }
+
+            ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
+        } else if (event.getTypeOfEvent() == TypeOfEvent::StartMovingToCrane) {
                 ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] -= 1;
 
                 is_y_first = false;
@@ -526,33 +564,35 @@ class PortManagerWin {
                     from_y = 222;
                 }
 
-                ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
-                break;
-            case TypeOfEvent::FinishOfUnloading:
-                schedule_area_->changeUnload(schedule_idxs_[event.getShip()->getName()]);
+                ships_[event.getShip()]->addEvent({ from_x, from_y, dis_x, dis_y, is_y_first, event.getTime() });
+        } else if (event.getTypeOfEvent() == TypeOfEvent::FinishOfUnloading) {
+            schedule_area_->changeUnload(schedule_idxs_[event.getShip()->getName()]);
 
-                from_x = static_cast<float>(143 + 128 * (event.getIdCrane() + 1));
-                is_y_first = true;
-                dis_y = -22;
+            from_x = static_cast<float>(143 + 128 * (event.getIdCrane() + 1));
+            is_y_first = true;
+            dis_y = -22;
 
-                if (event.getShip()->getType() == TypeOfCargo::Container) {
-                    from_y = 117;
-                    dis_y *= -1;
-                } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
-                    from_y = static_cast<float>(height_) - 140;
-                } else {
-                    from_y = 244;
-                }
+            if (event.getShip()->getType() == TypeOfCargo::Container) {
+                from_y = 117;
+                dis_y *= -1;
+            } else if (event.getShip()->getType() == TypeOfCargo::Granular) {
+                from_y = static_cast<float>(height_) - 140;
+            } else {
+                from_y = 244;
+            }
 
-                dis_x = std::max(max_crane_x_ + 280, static_cast<float>(width_));
+            auto unloaded_item = new UnloadedItem(event.getShip(), window_);
+            unloaded_item->setY(last_unloaded_ship_y_);
+            unloaded_item->setX(378);
+            last_unloaded_ship_y_ += unloaded_item->getHeight() + 15;
+            unloaded_ships_scroll_->addElm(unloaded_item);
 
-                ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
-                break;
-            case TypeOfEvent::ArrivalAtPort:
-                ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] += 1;
-                break;
-            default:
-                break;
+            dis_x = std::max(max_crane_x_ + 280, static_cast<float>(width_));
+
+            ships_[event.getShip()]->addEvent({from_x, from_y, dis_x, dis_y, is_y_first, event.getTime()});
+        }
+        else if (event.getTypeOfEvent() == TypeOfEvent::ArrivalAtPort) {
+            ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] += 1;
         }
     }
 
@@ -567,6 +607,7 @@ class PortManagerWin {
             ships_at_queue_counters_[static_cast<int64_t>(event.getShip()->getType())] += 1;
         } else if (event.getTypeOfEvent() == TypeOfEvent::FinishOfUnloading) {
             schedule_area_->changeUnload(schedule_idxs_[event.getShip()->getName()]);
+            unloaded_ships_scroll_->popBack();
         }
     }
 };
