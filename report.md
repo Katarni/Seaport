@@ -174,6 +174,16 @@ graph BT;
 
 ```mermaid
 graph TD;
+	subgraph backend
+		includes.h-->ScheduleItem.h
+		ScheduleItem.h-->ScheduleItem.cpp
+		ScheduleItem.h-->Ship.h
+		Ship.h-->Ship.cpp
+		Ship.h-->Event.h
+		Event.h-->Event.cpp
+		Manager.h-->Manager.cpp
+		Event.h-->Manager.h
+	end
 	subgraph frontend
 		KatLIb-->header.h
 		header.h-->MovingEvent.h
@@ -186,16 +196,11 @@ graph TD;
 		ScheduleScroll.h-->PortManagerWin.h
 		DrawableShip.h-->PortManagerWin.h
 	end
-	subgraph backend
-		includes.h-->ScheduleItem.h
-		ScheduleItem.h-->ScheduleItem.cpp
-		ScheduleItem.h-->Ship.h
-		Ship.h-->Ship.cpp
-		Ship.h-->Event.h
-		Event.h-->Event.cpp
-		Manager.h-->Manager.cpp
-		Event.h-->Manager.h
-	end
 	Manager.h-->header.h
 ```
 
+Зависимости библиотеки KatLib описаны отдельно
+## Используемые средства
+Для разработки данной программы использовался язык C++ (23-ий стандарт), а так же графическая библиотека [KatLib](https://github.com/Katarni/KatLib). Для сборки был использован Cmake версии 3.23, а для написания отчета был использован MarkDown. Редакторы текста и среды разработки, использованные в работе:
++ Clion
++ Obsidian
