@@ -335,7 +335,14 @@ class PortManagerWin {
                     } else if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
                         if (draw_schedule && schedule_area_->isHovered(static_cast<float>(event.mouseWheelScroll.x),
                                                           static_cast<float>(event.mouseWheelScroll.y))) {
-                            schedule_area_->moveAllY(static_cast<float>(kat::sign(event.mouseWheelScroll.delta) * 5));
+                            schedule_area_->moveAllY(static_cast<float>(
+                                                                kat::sign(event.mouseWheelScroll.delta) * 5));
+                        }
+                        if (draw_unloaded &&
+                            unloaded_ships_scroll_->isHovered(static_cast<float>(event.mouseWheelScroll.x),
+                                                               static_cast<float>(event.mouseWheelScroll.y))) {
+                            unloaded_ships_scroll_->moveAllY(static_cast<float>(
+                                                                kat::sign(event.mouseWheelScroll.delta) * 5));
                         }
                     }
                 }
