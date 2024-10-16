@@ -22,6 +22,7 @@ add_executable(PortManagerInterface main.cpp
         ResultWin.h
         schedule/DrawableScheduleItem.h
         schedule/ScheduleScroll.h
+        schedule/UnloadedItem.h
 )
 
 add_subdirectory(KatLib)
