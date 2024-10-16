@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Ship.h"
 
 enum class TypeOfEvent {
@@ -6,12 +7,12 @@ enum class TypeOfEvent {
 };
 
 class Event {
-public:
+ public:
     Event();
 
-    Event(int64_t time, TypeOfEvent type, Ship* ship);
+    Event(int64_t time, TypeOfEvent type, Ship *ship);
 
-    Event(int id_crane, int64_t time, TypeOfEvent type, Ship* ship);
+    Event(int id_crane, int64_t time, TypeOfEvent type, Ship *ship);
 
     [[nodiscard]]
     int getIdCrane() const;
@@ -23,14 +24,14 @@ public:
     TypeOfEvent getTypeOfEvent() const;
 
     [[nodiscard]]
-    Ship* getShip() const;
+    Ship *getShip() const;
 
-    bool operator<(const Event& other) const;
+    bool operator<(const Event &other) const;
 
-private:
+ private:
     int id_crane_;
     int64_t time_;
     TypeOfEvent type_;
-    Ship* ship_;
+    Ship *ship_;
 };
 

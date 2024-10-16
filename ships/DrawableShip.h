@@ -2,7 +2,6 @@
 // Created by Тимур Ахметзянов on 07.10.2024.
 //
 
-#include "../header.h"
 #include "MovingEvent.h"
 
 

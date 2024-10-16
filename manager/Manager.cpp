@@ -62,7 +62,7 @@ void Manager::setCountLiquidCranes(int count) {
     count_liquid_cranes_ = count;
 }
 
-void Manager::modelingForOneType(std::vector<Ship*> &ships) {
+void Manager::modelingForOneType(std::vector<Ship *> &ships) {
     if (ships.empty()) return;
     std::sort(ships.begin(), ships.end());
     int64_t count_cranes;
@@ -86,7 +86,7 @@ void Manager::modelingForOneType(std::vector<Ship*> &ships) {
     for (int i = 0; i < count_cranes; ++i) {
         cranes.insert({0, i});
     }
-    for (auto& ship : ships) {
+    for (auto &ship: ships) {
         events_.emplace_back(ship->getArrival() - kDistArrivalQueue / kSpeedShip,
                              TypeOfEvent::ArrivalOnScreen,
                              ship);
@@ -122,8 +122,8 @@ void Manager::modelingForOneType(std::vector<Ship*> &ships) {
 }
 
 void Manager::modeling() {
-    std::vector<Ship*> container_ships, liquid_ships, granular_ships;
-    for (auto& ship : ships_) {
+    std::vector<Ship *> container_ships, liquid_ships, granular_ships;
+    for (auto &ship: ships_) {
         if (ship.getType() == TypeOfCargo::Container) {
             container_ships.push_back(&ship);
         } else if (ship.getType() == TypeOfCargo::Granular) {
@@ -139,8 +139,8 @@ void Manager::modeling() {
     ptr_ = 0;
 }
 
-void Manager::setShips(std::vector<ScheduleItem>& items) {
-    for (auto& item : items) {
+void Manager::setShips(std::vector<ScheduleItem> &items) {
+    for (auto &item: items) {
         int64_t delay = GetRandomFromRange(delay_min_, delay_max_);
         int64_t late_arrival = GetRandomFromRange(late_arrival_min_,
                                                   late_arrival_max_);

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "includes.h"
 
 enum class TypeOfCargo {
@@ -7,8 +8,8 @@ enum class TypeOfCargo {
 
 
 class ScheduleItem {
-public:
-    ScheduleItem(TypeOfCargo type, const std::string& name, int64_t weight, int64_t arrival);
+ public:
+    ScheduleItem(TypeOfCargo type, const std::string &name, int64_t weight, int64_t arrival);
 
     [[nodiscard]]
     int64_t getUnloadTime() const;
@@ -25,7 +26,7 @@ public:
     [[nodiscard]]
     TypeOfCargo getType() const;
 
-protected:
+ protected:
     TypeOfCargo type_;
     std::string name_;
     int64_t weight_, unload_time_, arrival_;

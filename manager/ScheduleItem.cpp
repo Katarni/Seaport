@@ -10,8 +10,8 @@ std::string generateName() {
     return res;
 }
 
-ScheduleItem::ScheduleItem(TypeOfCargo type, const std::string& name,
-           int64_t weight, int64_t arrival)
+ScheduleItem::ScheduleItem(TypeOfCargo type, const std::string &name,
+                           int64_t weight, int64_t arrival)
         : type_(type),
           name_(name),
           weight_(weight), arrival_(arrival) {

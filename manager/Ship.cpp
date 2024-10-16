@@ -1,12 +1,11 @@
 #include "Ship.h"
 
 
+Ship::Ship(TypeOfCargo type, const std::string &name,
+           int64_t weight, int64_t arrival)
+        : ScheduleItem(type, name, weight, arrival) {}
 
-Ship::Ship(TypeOfCargo type, const std::string& name,
-    int64_t weight, int64_t arrival)
-    : ScheduleItem(type, name, weight, arrival) {}
-
-bool Ship::operator<(const Ship& other) const {
+bool Ship::operator<(const Ship &other) const {
     if (arrival_ != other.arrival_) {
         return arrival_ < other.arrival_;
     }
@@ -28,7 +27,7 @@ int64_t Ship::getFee() const {
     return fee_;
 }
 
-Ship::Ship(const ScheduleItem& item) : ScheduleItem(item), fee_(0) {}
+Ship::Ship(const ScheduleItem &item) : ScheduleItem(item), fee_(0) {}
 
 void Ship::addToFee(int64_t delta) {
     fee_ += delta;

@@ -1,14 +1,15 @@
 #pragma once
+
 #include "includes.h"
 #include "ScheduleItem.h"
 
 class Ship : public ScheduleItem {
-public:
-    Ship(TypeOfCargo type, const std::string& name, int64_t weight, int64_t arrival);
+ public:
+    Ship(TypeOfCargo type, const std::string &name, int64_t weight, int64_t arrival);
 
-    explicit Ship(const ScheduleItem& item);
+    explicit Ship(const ScheduleItem &item);
 
-    bool operator<(const Ship& other) const;
+    bool operator<(const Ship &other) const;
 
     [[nodiscard]]
     int64_t getFee() const;
@@ -29,6 +30,6 @@ public:
 
     void addToFee(int64_t delta);
 
-private:
+ private:
     int64_t fee_, start_of_unloading_, waiting_time_;
 };

@@ -1,12 +1,13 @@
 #pragma once
+
 #include "Ship.h"
 #include "Event.h"
 
 class Manager {
-public:
+ public:
     Manager();
 
-    void setShips(std::vector<ScheduleItem>& ships);
+    void setShips(std::vector<ScheduleItem> &ships);
 
     void modeling();
 
@@ -40,15 +41,16 @@ public:
     Event getCur();
 
     int goNext();
+
     int goPrev();
 
     void setEventTime(int time);
 
-    std::vector<ScheduleItem>& getSchedule();
+    std::vector<ScheduleItem> &getSchedule();
 
 
-private:
-    void modelingForOneType(std::vector<Ship*>& ships);
+ private:
+    void modelingForOneType(std::vector<Ship *> &ships);
 
     std::vector<Ship> ships_;
     std::vector<Event> events_;
